@@ -945,6 +945,26 @@
             }
 
         }
+
+        .lang-btn {
+            background: none;
+            border: 1.5px solid var(--color-border);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 8px;
+        }
+
+        .lang-btn:hover {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+        }
     </style>
 </head>
 <body>
@@ -959,11 +979,12 @@
         <div class="nav-inner">
             <a href="#" class="nav-logo">Marek Tatýrek</a>
             <ul class="nav-links">
-                <li><a href="#about">O mně</a></li>
-                <li><a href="#projects">Projekty</a></li>
-                <li><a href="#experience">Zkušenosti</a></li>
-                <li><a href="#contact">Kontakt</a></li>
+                <li><a href="#about" data-i18n="nav.about">O mně</a></li>
+                <li><a href="#projects" data-i18n="nav.projects">Projekty</a></li>
+                <li><a href="#experience" data-i18n="nav.experience">Zkušenosti</a></li>
+                <li><a href="#contact" data-i18n="nav.contact">Kontakt</a></li>
             </ul>
+            <button class="lang-btn" id="langBtn" onclick="toggleLang()">EN</button>
         </div>
     </nav>
 
@@ -974,18 +995,18 @@
 
     <section class="hero">
         <div class="hero-content">
-            <span class="hero-label">Embedded Engineer</span>
-            <h1>Ahoj, jsem<br>Marek Tatýrek</h1>
-            <p>
+            <span class="hero-label" data-i18n="hero.label">Embedded Engineer</span>
+            <h1 data-i18n-html="hero.h1">Ahoj, jsem<br>Marek Tatýrek</h1>
+            <p data-i18n="hero.p">
                 Vyvíjím hardware a firmware, baví mě spojení těchto dvou neoddělitelných světů.
             </p>
             <div class="hero-cta">
                 <a href="#projects" class="btn btn-primary">
-                    Moje projekty
+                    <span data-i18n="hero.cta.projects">Moje projekty</span>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
                 </a>
-                <a href="#contact" class="btn btn-secondary">Kontaktujte mě</a>
-                <a href="about.html" class="btn btn-secondary">Více o mně</a>
+                <a href="#contact" class="btn btn-secondary" data-i18n="hero.cta.contact">Kontaktujte mě</a>
+                <a href="about.html" class="btn btn-secondary" data-i18n="hero.cta.about">Více o mně</a>
             </div>
         </div>
     </section>
@@ -997,10 +1018,10 @@
          ========================================== -->
     <section class="section" id="about">
         <div class="reveal">
-            <span class="section-label">O mně</span>
+            <span class="section-label" data-i18n="about.label">O mně</span>
             <div class="about-grid">
                 <div class="about-text">
-                    <p>
+                    <p data-i18n-html="about.p">
                         Jsem student 2. ročníku magisterského studia oboru <a href="https://www.vut.cz/studenti/programy/program/9479" target="_blank">kybernetka, automatizace a měření</a>.
                         Zajímá mě propojení mezi hardwarem a softwarem, proto se zabývám zejména PCB designem a embedded programováním.
                         Věci si rád ověřuji praxí, proto jsem si postavil malou laboratoř a své studium doplňoval projekty, na kterých jsem se toho spoustu naučil.
@@ -1011,47 +1032,47 @@
                     <div class="skills-grid">
                         <div class="skill-tag">
                             <span class="skill-name">C / C++</span>
-                            <span class="skill-desc">Firmware pro STM32, ESP32 — práce s registry, HAL, RTOS.</span>
+                            <span class="skill-desc" data-i18n="skill.c">Firmware pro STM32, ESP32 — práce s registry, HAL, RTOS.</span>
                         </div>
                         <div class="skill-tag">
                             <span class="skill-name">IoT - Matter</span>
-                            <span class="skill-desc">Protokol Matter, Thread, integrace do chytré domácnosti.</span>
+                            <span class="skill-desc" data-i18n="skill.iot">Protokol Matter, Thread, integrace do chytré domácnosti.</span>
                         </div>
                         <div class="skill-tag">
                             <span class="skill-name">Python</span>
-                            <span class="skill-desc">Skripty, automatizace, zpracování dat, testování.</span>
+                            <span class="skill-desc" data-i18n="skill.python">Skripty, automatizace, zpracování dat, testování.</span>
                         </div>
                         <div class="skill-tag">
                             <span class="skill-name">ESP32, STM32, nRF52</span>
-                            <span class="skill-desc">Vývoj na ARM Cortex-M a Xtensa platformách.</span>
+                            <span class="skill-desc" data-i18n="skill.esp">Vývoj na ARM Cortex-M a Xtensa platformách.</span>
                         </div>
                         <div class="skill-tag">
                             <span class="skill-name">Matlab</span>
-                            <span class="skill-desc">Simulace, modelování systémů, zpracování signálů.</span>
+                            <span class="skill-desc" data-i18n="skill.matlab">Simulace, modelování systémů, zpracování signálů.</span>
                         </div>
                         <div class="skill-tag">
                             <span class="skill-name">PCB Design</span>
-                            <span class="skill-desc">Návrh schémat a layoutu v KiCadu, osazování.</span>
+                            <span class="skill-desc" data-i18n="skill.pcb">Návrh schémat a layoutu v KiCadu, osazování.</span>
                         </div>
                         <div class="skill-tag">
                             <span class="skill-name">VHDL</span>
-                            <span class="skill-desc">Návrh digitálních obvodů pro FPGA.</span>
+                            <span class="skill-desc" data-i18n="skill.vhdl">Návrh digitálních obvodů pro FPGA.</span>
                         </div>
                         <div class="skill-tag">
                             <span class="skill-name">3D modeling</span>
-                            <span class="skill-desc">Modelování krabic a dílů pro 3D tisk.</span>
+                            <span class="skill-desc" data-i18n="skill.3d">Modelování krabic a dílů pro 3D tisk.</span>
                         </div>
                         <div class="skill-tag">
                             <span class="skill-name">Git</span>
-                            <span class="skill-desc">Verzování kódu, branching, code review.</span>
+                            <span class="skill-desc" data-i18n="skill.git">Verzování kódu, branching, code review.</span>
                         </div>
                         <div class="skill-tag">
                             <span class="skill-name">Energy Harvesting</span>
-                            <span class="skill-desc">Napájení IoT zařízení z okolní energie.</span>
+                            <span class="skill-desc" data-i18n="skill.eh">Napájení IoT zařízení z okolní energie.</span>
                         </div>
                     </div>
                 </div>
-                <p class="about-full-width">
+                <p class="about-full-width" data-i18n-html="about.p2">
                     Mám zkušenost od návrhu schémat a layoutu desky, přes nízkoúrovňové programování na úrovni registrů, komunikační protokoly až po RTOS.
                     Mé pozornosti se zvlášť těší IoT a chytrá domácnost, kterými jsem se zabýval v podobě protokolu Matter jak ve své <a href="https://dspace.vut.cz/items/0862d79d-6370-4411-a905-91d1db68de6f" target="_blank">bakalářské</a>,
                     tak i diplomové práci.
@@ -1068,9 +1089,9 @@
          ========================================== -->
     <section class="section" id="projects">
         <div class="reveal">
-            <span class="section-label">Projekty</span>
-            <h2 class="section-title">Na čem pracuji</h2>
-            <p class="section-desc">
+            <span class="section-label" data-i18n="projects.label">Projekty</span>
+            <h2 class="section-title" data-i18n="projects.h2">Na čem pracuji</h2>
+            <p class="section-desc" data-i18n="projects.desc">
                 Výběr pro mě nejzajímavějších projektů, které jsem dělal.
             </p>
         </div>
@@ -1094,10 +1115,12 @@
                  
                  data-images='["akvarko.jpg","akvarko_homekit.png"]'
                  data-tags="Matter,ESP32,PCB"
-                 data-link="#">
+                 data-link="#"
+                 data-title-en="Aquarium Control System"
+                 data-description-en="&lt;p&gt;I've been into fishkeeping since childhood, but I'm a rather lazy aquarist — I enjoy watching the tank but dislike regular manual intervention. That was the motivation for this project. Its predecessor was an Arduino Nano-based controller that only managed lights, with no easy user interface and with timing drift. I decided to build a better solution as part of my bachelor's thesis.&lt;/p&gt;&lt;p&gt;When I was about to start, Matter 1.0 had just been released. After consulting with my supervisor, we agreed to attempt an implementation despite its immaturity. It succeeded, though with many challenges — for instance, the CO2 cluster wasn't supported by the Apple ecosystem I tested in, even though it appeared in the official specification.&lt;/p&gt;&lt;p&gt;The final device allowed setting both main plant-growth lights and RGB accent lighting, monitoring and adjusting water temperature, monitoring CO2 levels and controlling a valve for regulation.&lt;/p&gt;&lt;p&gt;Despite the challenges posed mainly by the immaturity of the Matter standard, I fulfilled the thesis requirements and received a grade of A.&lt;/p&gt;">
                 <div class="project-icon">🐟</div>
-                <h3>Řídící systém akvárií</h3>
-                <p>Zajímám se o akvaristiku, kterou jsem v tomto projektu zkloubil se svou zálibou
+                <h3 data-i18n="proj.aquarium.h3">Řídící systém akvárií</h3>
+                <p data-i18n="proj.aquarium.p">Zajímám se o akvaristiku, kterou jsem v tomto projektu zkloubil se svou zálibou
                  v chytrých domácnostech. Výsledkem je zařízení pro řízení akvária, které lze jako komponentu přidat do
                  libovolného systému smart home.</p>
                 <div class="project-tags">
@@ -1132,10 +1155,12 @@
                  "
                  data-images='["zesilovac.jpg", "eink.jpg"]'
                  data-tags="Analog,Audio,PCB,ESP32"
-                 data-link="#">
+                 data-link="#"
+                 data-title-en="Amplifier"
+                 data-description-en="&lt;p&gt;Building my own amplifier had been a dream since high school, where I spent time repairing vintage receivers. I started the build around 2024, collaborating with a friend. The amplifier features a 7-band equaliser, 50 W output stage, low harmonic distortion and noise floor. The power supply includes soft-start, standby mode, DC offset detection at the speaker output, and power-loss detection — giving a smooth, click-free turn-on and turn-off. EMC was considered too, with input filters and a common-mode rejection circuit. Connectivity features such as AirPlay and Bluetooth are planned.&lt;/p&gt;&lt;p&gt;The amplifier is built around the MAX98080 signal processor and LM3886 class-AB output stages. The ESP32-S3 controls the system, communicating with the DSP via I2C for configuration and I2S for audio streaming.&lt;/p&gt;&lt;p&gt;What is still missing is the front panel. An interesting feature planned for it is a display combining an E-ink screen and a classic VU meter needle. Normally the needle indicates output level; when needed, the E-ink display serves as a configuration interface. The slow E-ink refresh combined with the needle's faster dynamics creates a pleasant analogue feel that I personally miss in today's world of glowing screens.&lt;/p&gt;&lt;p&gt;The most challenging part was programming the DSP — no library was available, so I dove into the datasheet and wrote one from scratch. I also designed the main board with DSP and output stages, E-ink display control, switching power supply, and the metal enclosure. My colleague handled the power supply, protection circuits, I/O interfaces, and 3D-printed covers.&lt;/p&gt;">
                 <div class="project-icon">🔊</div>
-                <h3>Zesilovač</h3>
-                <p>Tímto projektem jsem si splnil svůj sen ze střední školy. Od píky jsem si postavil
+                <h3 data-i18n="proj.amplifier.h3">Zesilovač</h3>
+                <p data-i18n="proj.amplifier.p">Tímto projektem jsem si splnil svůj sen ze střední školy. Od píky jsem si postavil
                     zesilovač ve třídě AB se signálovým procesorem. Jedná se o projekt kterému jsem dal
                     nejvíc času a zároveň je asi mým nejoblíbenějším.
                 </p>
@@ -1161,11 +1186,13 @@
                 "
                  data-images='["harvester.jpg"]'
                  data-tags="Matter,NFC,nRF52,ESP32"
-                 data-link="#">
+                 data-link="#"
+                 data-title-en="Energy Harvesting Switch"
+                 data-description-en="&lt;p&gt;With a growing interest in IoT and bringing these technologies to places they weren't originally designed for, energy harvesting has become very appealing. The goal is to design an energy harvester powered by a kinetic harvester, use that energy to send a signal to a central system (acting as a Matter bridge) that relays switch state changes into the smart home ecosystem. Pairing will be done via NFC.&lt;/p&gt;&lt;p&gt;This is an ongoing project. Currently I have a working harvester that communicates via BT with a computer. It is built around the nRF52832, known for ultra-low power consumption. An interesting challenge: even though the nRF SDK has a well-written BT stack, its initialisation is too expensive in terms of harvested energy, so I wrote my own minimal BT transmission driver. I am now working on the Matter bridge part.&lt;/p&gt;">
                 <div class="project-icon">🔋</div>
-                <h3>Energy harvesting vypínač</h3>
-                <p>Touto prací jsem se pustil do neprobádaných vod ultra low power a NFC. Vypracování
-                    je zároveň tématem mé diplomové práce. 
+                <h3 data-i18n="proj.harvester.h3">Energy harvesting vypínač</h3>
+                <p data-i18n="proj.harvester.p">Touto prací jsem se pustil do neprobádaných vod ultra low power a NFC. Vypracování
+                    je zároveň tématem mé diplomové práce.
                 </p>
                 <div class="project-tags">
                     <span>Matter</span>
@@ -1193,10 +1220,12 @@
                  "
                  data-images='["lampicka.jpg"]'
                  data-tags="Matter,ESP,3D tisk"
-                 data-link="#">
+                 data-link="#"
+                 data-title-en="Monitor Backlight Lamp"
+                 data-description-en="&lt;p&gt;This is a monitor backlight lamp mounted behind the monitor (typically via a VESA bracket), powered from 8–28 V.&lt;/p&gt;&lt;p&gt;The build had two parts — electronic and mechanical. While the electronics were more complex, the bigger challenge for me was the mechanical part, especially designing and printing the joints.&lt;/p&gt;&lt;p&gt;The electronics are built around an ESP32-S3 on a custom 30 × 35 mm PCB, featuring a step-down from 24 V to 5 V, a 3.3 V LDO, a 2-channel PWM output for LED control, and a rotary encoder input.&lt;/p&gt;&lt;p&gt;Control is via a rotary encoder in the lamp body, or through the smart home system (e.g. voice assistant). Smart home integration enables automatic colour temperature adjustment by time of day and various automations.&lt;/p&gt;&lt;p&gt;The mechanical part was challenging mainly due to the strength limitations of 3D-printed parts. The lamp has two adjustable joints — I balanced aesthetics against strength, ultimately choosing what I preferred even at the cost of some fragility.&lt;/p&gt;&lt;p&gt;The lamp has been serving me reliably for 3 years without any issues.&lt;/p&gt;">
                 <div class="project-icon">💡</div>
-                <h3>Lampička za monitor</h3>
-                <p>Tímto jednoduchým projektem jsem vyřešil svůj problém s nedostatečně a nerovnoměrně osvícenou
+                <h3 data-i18n="proj.lamp.h3">Lampička za monitor</h3>
+                <p data-i18n="proj.lamp.p">Tímto jednoduchým projektem jsem vyřešil svůj problém s nedostatečně a nerovnoměrně osvícenou
                     pracovní plochou. Vyrobil jsem si lampičku s nastavitelnou chromatičností a jasem, opět nechybí
                     ani integrace do chytré domácnosti.
                 </p>
@@ -1214,10 +1243,12 @@
                  &lt;p&gt;Na tomto projektu spolupracuji s kolegou, který se zasloužil o návrh HW, přičemž já mám na starosti FW. Na konstrukci samotné jsme pak pracovali společně.&lt;/p&gt;"
                  data-images='["hat.jpg"]'
                  data-tags="FW,Konstrukce"
-                 data-link="#">
+                 data-link="#"
+                 data-title-en="Height-Adjustable Desk"
+                 data-description-en="&lt;p&gt;Every standing desk I'd seen seemed flimsy and I didn't like their design. They also lack smart home integration. So I decided to build my own. The solution is built around the ESP32-S3 with a DRV8873 for motor control, on a welded steel frame.&lt;/p&gt;&lt;p&gt;The desk already has all functions of a standard commercial desk — safety protections, memory positions, calibration, and manual mode. The hardware has headroom for features I'm gradually adding: smart home connectivity, an advanced control interface, sensor inputs (air quality, temperature), and a PWM output for LED strips.&lt;/p&gt;&lt;p&gt;This is a collaborative project with a friend who designed the hardware, while I'm responsible for the firmware. We worked on the physical construction together.&lt;/p&gt;">
                 <div class="project-icon">🪑</div>
-                <h3>Výškově nastavitelný stůl</h3>
-                <p>Vážím si svého zdraví a vzhledem kolik času strávím sezením, rozhodl jsem se postavit si vlastní stůl se svařovaným rámem,
+                <h3 data-i18n="proj.desk.h3">Výškově nastavitelný stůl</h3>
+                <p data-i18n="proj.desk.p">Vážím si svého zdraví a vzhledem kolik času strávím sezením, rozhodl jsem se postavit si vlastní stůl se svařovaným rámem,
                     řízením motorů přes DRV8873 a firmware na ESP32-S3. V plánu je i integrace do chytré domácnosti.
                 </p>
                 <div class="project-tags">
@@ -1245,10 +1276,12 @@
                  "
                  data-images='["repraky.jpg"]'
                  data-tags="Audio,Konstrukce,Design"
-                 data-link="#">
+                 data-link="#"
+                 data-title-en="Speakers and Subwoofer"
+                 data-description-en="&lt;p&gt;I worked on this during the COVID lockdowns while setting up my workshop. I first built a pair of passive speakers with 8-ohm impedance and 100 W max power.&lt;/p&gt;&lt;p&gt;Since I care about audio quality, I studied loudspeaker design thoroughly, aided by a book by Kamil Toman from Dexon. I found the design can be complex and even small details matter. I settled on a bass-reflex design, used MDF for its good damping properties, cut and mitre-glued the panels. The drivers came from Dexon and I designed and etched the crossover myself.&lt;/p&gt;&lt;p&gt;I'm happy with the result — especially the pleasantly full low end, surprisingly rich given the speaker size.&lt;/p&gt;&lt;p&gt;When building the active subwoofer, a friend joined me — the same one I later collaborated with on the amplifier. We focused on the preamplifier, which includes a low-pass filter, a notch filter for room resonances, a channel mixer, volume control, and auto standby. We encountered oscillation issues with NE5532 circuits caused by poor component placement on the PCB. This taught me how crucial board layout is.&lt;/p&gt;">
                 <div class="project-icon">🎵</div>
-                <h3>Reproduktory a basová jednotka</h3>
-                <p>Jeden z mých prvních projektů, byla stavba reproduktorů a basové jednotky,
+                <h3 data-i18n="proj.speakers.h3">Reproduktory a basová jednotka</h3>
+                <p data-i18n="proj.speakers.p">Jeden z mých prvních projektů, byla stavba reproduktorů a basové jednotky,
                     které používám dodnes.
                 </p>
                 <div class="project-tags">
@@ -1267,43 +1300,43 @@
          ========================================== -->
     <section class="section" id="experience">
         <div class="reveal">
-            <span class="section-label">Zkušenosti</span>
-            <h2 class="section-title">Kde jsem pracoval</h2>
+            <span class="section-label" data-i18n="exp.label">Zkušenosti</span>
+            <h2 class="section-title" data-i18n="exp.h2">Kde jsem pracoval</h2>
            
         </div>
         <div class="timeline reveal">
 
             <div class="timeline-item">
-                <div class="timeline-date">2024 — současnost</div>
-                <h3>Magisterské studium</h3>
+                <div class="timeline-date" data-i18n="tl.1.date">2024 — současnost</div>
+                <h3 data-i18n="tl.1.h3">Magisterské studium</h3>
                 <div class="company">VUT Brno</div>
-                <p>
+                <p data-i18n="tl.1.p">
                     Kybernetika, automatizace a měření (FEKT) a Management a ekonomie (FP).
                 </p>
             </div>
 
             <div class="timeline-item">
-                <div class="timeline-date">2025</div>
-                <h3>Erasmus</h3>
+                <div class="timeline-date" data-i18n="tl.2.date">2025</div>
+                <h3 data-i18n="tl.2.h3">Erasmus</h3>
                 <div class="company">Università degli Studi di Padova</div>
-                <p>
+                <p data-i18n="tl.2.p">
                     Semestrální studijní pobyt v Itálii.
                 </p>
             </div>
 
             <div class="timeline-item">
-                <div class="timeline-date">2021 — 2024</div>
-                <h3>Bakalářské studium</h3>
+                <div class="timeline-date" data-i18n="tl.3.date">2021 — 2024</div>
+                <h3 data-i18n="tl.3.h3">Bakalářské studium</h3>
                 <div class="company">VUT Brno</div>
-                <p>
+                <p data-i18n="tl.3.p">
                     Automatizace a měřicí technika, FEKT.
                 </p>
             </div>
 
             <div class="timeline-item">
-                <div class="timeline-date">2017 — 2021</div>
-                <h3>Opravy vintage audio receiverů</h3>
-                <p>
+                <div class="timeline-date" data-i18n="tl.4.date">2017 — 2021</div>
+                <h3 data-i18n="tl.4.h3">Opravy vintage audio receiverů</h3>
+                <p data-i18n="tl.4.p">
                     Servis a opravy analogových audio receiverů během střední školy.
                 </p>
             </div>
@@ -1318,9 +1351,9 @@
          ========================================== -->
     <section class="section" id="contact">
         <div class="contact-section reveal">
-            <span class="section-label">Kontakt</span>
-            <h2 class="section-title">Ozvěte se mi</h2>
-            <p class="section-desc">
+            <span class="section-label" data-i18n="contact.label">Kontakt</span>
+            <h2 class="section-title" data-i18n="contact.h2">Ozvěte se mi</h2>
+            <p class="section-desc" data-i18n="contact.desc">
                 Máte projekt, nápad, nebo se chcete jen spojit?
                 Napište mi.
             </p>
@@ -1360,7 +1393,7 @@
                 <div class="modal-description"></div>
                 <div class="project-tags modal-tags"></div>
                 <a href="#" class="project-link modal-link" target="_blank">
-                    Zobrazit na GitHubu
+                    <span data-i18n="modal.github">Zobrazit na GitHubu</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
                 </a>
             </div>
@@ -1380,6 +1413,104 @@
          element vstoupí do viewportu (viditelné oblasti).
          Používáme to pro animace při scrollování.
     -->
+    <!-- Language switcher -->
+    <script>
+        (function () {
+            var T = {
+                en: {
+                    "nav.about": "About",
+                    "nav.projects": "Projects",
+                    "nav.experience": "Experience",
+                    "nav.contact": "Contact",
+                    "hero.label": "Embedded Engineer",
+                    "hero.h1": "Hi, I\u2019m<br>Marek Tatýrek",
+                    "hero.p": "I develop hardware and firmware \u2014 I love bridging these two inseparable worlds.",
+                    "hero.cta.projects": "My projects",
+                    "hero.cta.contact": "Contact me",
+                    "hero.cta.about": "More about me",
+                    "about.label": "About",
+                    "about.p": "I\u2019m a 2nd-year master\u2019s student in <a href=\"https://www.vut.cz/studenti/programy/program/9479\" target=\"_blank\">cybernetics, automation and measurement</a>. I\u2019m interested in the intersection of hardware and software, focusing on PCB design and embedded programming. I like to verify things in practice, so I built a small lab and complemented my studies with hands-on projects. Alongside that, I also study <a href=\"https://www.vut.cz/studenti/programy/program/9373\" target=\"_blank\">management and economics</a>.",
+                    "skill.c": "Firmware for STM32, ESP32 \u2014 registers, HAL, RTOS.",
+                    "skill.iot": "Matter protocol, Thread, smart home integration.",
+                    "skill.python": "Scripts, automation, data processing, testing.",
+                    "skill.esp": "Development on ARM Cortex-M and Xtensa platforms.",
+                    "skill.matlab": "Simulation, system modelling, signal processing.",
+                    "skill.pcb": "Schematic and PCB layout in KiCad, assembly.",
+                    "skill.vhdl": "Digital circuit design for FPGAs.",
+                    "skill.3d": "Modelling enclosures and parts for 3D printing.",
+                    "skill.git": "Version control, branching, code review.",
+                    "skill.eh": "Powering IoT devices from ambient energy.",
+                    "about.p2": "My experience spans from schematic and PCB layout design to low-level register programming, communication protocols, and RTOS. I have a particular interest in IoT and smart home, which I explored through the Matter protocol in both my <a href=\"https://dspace.vut.cz/items/0862d79d-6370-4411-a905-91d1db68de6f\" target=\"_blank\">bachelor\u2019s</a> and master\u2019s theses. I think the best showcase of what I can do is <a href=\"#projects\">my projects</a>.",
+                    "projects.label": "Projects",
+                    "projects.h2": "What I work on",
+                    "projects.desc": "A selection of my most interesting projects.",
+                    "proj.aquarium.h3": "Aquarium Control System",
+                    "proj.aquarium.p": "I combined my passion for fishkeeping with smart home tech. The result is an aquarium controller that integrates as a component into any smart home system.",
+                    "proj.amplifier.h3": "Amplifier",
+                    "proj.amplifier.p": "With this project I fulfilled a dream from secondary school. I built a class AB amplifier with a DSP from scratch \u2014 the project I\u2019ve invested the most time in.",
+                    "proj.harvester.h3": "Energy Harvesting Switch",
+                    "proj.harvester.p": "With this project I ventured into ultra-low power design and NFC. It is also the topic of my master\u2019s thesis.",
+                    "proj.lamp.h3": "Monitor Backlight Lamp",
+                    "proj.lamp.p": "A simple project that solved my uneven desk lighting. Adjustable colour temperature and brightness, with smart home integration.",
+                    "proj.desk.h3": "Height-Adjustable Desk",
+                    "proj.desk.p": "I built my own standing desk with a welded frame, DRV8873 motor control and ESP32-S3 firmware. Smart home integration is also planned.",
+                    "proj.speakers.h3": "Speakers and Subwoofer",
+                    "proj.speakers.p": "One of my first projects \u2014 building speakers and a subwoofer unit that I still use today.",
+                    "exp.label": "Experience",
+                    "exp.h2": "Where I\u2019ve worked",
+                    "tl.1.date": "2024 \u2014 present",
+                    "tl.1.h3": "Master\u2019s degree",
+                    "tl.1.p": "Cybernetics, Automation and Measurement (FEEC) and Management and Economics (FBE).",
+                    "tl.2.date": "2025",
+                    "tl.2.h3": "Erasmus",
+                    "tl.2.p": "Semester study stay in Italy.",
+                    "tl.3.date": "2021 \u2014 2024",
+                    "tl.3.h3": "Bachelor\u2019s degree",
+                    "tl.3.p": "Automation and Measurement Technology, FEEC.",
+                    "tl.4.date": "2017 \u2014 2021",
+                    "tl.4.h3": "Vintage audio receiver repairs",
+                    "tl.4.p": "Servicing and repairing analogue audio receivers during secondary school.",
+                    "contact.label": "Contact",
+                    "contact.h2": "Get in touch",
+                    "contact.desc": "Have a project, an idea, or just want to connect? Write to me.",
+                    "modal.github": "View on GitHub"
+                }
+            };
+
+            var textOrig = new Map();
+            var htmlOrig = new Map();
+
+            function applyLang(lang) {
+                document.querySelectorAll('[data-i18n]').forEach(function (el) {
+                    if (!textOrig.has(el)) textOrig.set(el, el.textContent.trim());
+                    var t = lang === 'en' ? T.en[el.dataset.i18n] : textOrig.get(el);
+                    if (t !== undefined) el.textContent = t;
+                });
+                document.querySelectorAll('[data-i18n-html]').forEach(function (el) {
+                    if (!htmlOrig.has(el)) htmlOrig.set(el, el.innerHTML);
+                    var t = lang === 'en' ? T.en[el.dataset.i18nHtml] : htmlOrig.get(el);
+                    if (t !== undefined) el.innerHTML = t;
+                });
+                var btn = document.getElementById('langBtn');
+                if (btn) btn.textContent = lang === 'cs' ? 'EN' : 'CS';
+                document.documentElement.lang = lang;
+                localStorage.setItem('lang', lang);
+                window._lang = lang;
+            }
+
+            window.toggleLang = function () {
+                applyLang(window._lang === 'en' ? 'cs' : 'en');
+            };
+            window.applyLang = applyLang;
+
+            var saved = localStorage.getItem('lang') || 'cs';
+            window._lang = saved;
+            if (saved === 'en') applyLang('en');
+            var btn = document.getElementById('langBtn');
+            if (btn) btn.textContent = saved === 'cs' ? 'EN' : 'CS';
+        })();
+    </script>
+
     <script>
         // ============================================
         // Injekce obrázků do karet projektů
@@ -1484,8 +1615,9 @@
         const modalLink = modal.querySelector('.modal-link');
 
         function openModal(card) {
-            modalTitle.textContent = card.dataset.title;
-            modalDesc.innerHTML = card.dataset.description;
+            const lang = window._lang || 'cs';
+            modalTitle.textContent = (lang === 'en' && card.dataset.titleEn) ? card.dataset.titleEn : card.dataset.title;
+            modalDesc.innerHTML = (lang === 'en' && card.dataset.descriptionEn) ? card.dataset.descriptionEn : card.dataset.description;
 
             // Galerie obrázků
             modalGallery.innerHTML = '';

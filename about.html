@@ -195,6 +195,26 @@
                 display: none;
             }
         }
+
+        .lang-btn {
+            background: none;
+            border: 1.5px solid var(--color-border);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 8px;
+        }
+
+        .lang-btn:hover {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+        }
     </style>
 </head>
 <body>
@@ -203,80 +223,136 @@
         <div class="nav-inner">
             <a href="index.html" class="nav-logo">Marek Tatýrek</a>
             <ul class="nav-links">
-                <li><a href="index.html#about">O mně</a></li>
-                <li><a href="index.html#projects">Projekty</a></li>
-                <li><a href="index.html#experience">Zkušenosti</a></li>
-                <li><a href="index.html#contact">Kontakt</a></li>
+                <li><a href="index.html#about" data-i18n="nav.about">O mně</a></li>
+                <li><a href="index.html#projects" data-i18n="nav.projects">Projekty</a></li>
+                <li><a href="index.html#experience" data-i18n="nav.experience">Zkušenosti</a></li>
+                <li><a href="index.html#contact" data-i18n="nav.contact">Kontakt</a></li>
             </ul>
+            <button class="lang-btn" id="langBtn" onclick="toggleLang()">EN</button>
         </div>
     </nav>
 
     <main class="about-page">
-        <span class="section-label">O mně</span>
-        <h1>Pár slov o mně</h1>
+        <span class="section-label" data-i18n="about.page.label">O mně</span>
+        <h1 data-i18n="about.page.h1">Pár slov o mně</h1>
 
         <img src="zaba.jpeg" alt="Marek Tatýrek" style="float: right; width: 200px; border-radius: 8px; margin: 0 0 24px 24px;">
 
-        <p>
+        <p data-i18n="about.p1">
             Jmenuji se Marek Tatýrek, je mi 24 let a elektronikou a programováním se zabývam už od základní školy.
         </p>
 
-        <p>
+        <p data-i18n="about.p2">
             Studoval jsem
             Střední průmyslovou školu ve Zlíně, obor Elektrotechnika se zaměřením na automatizaci a zabezpečovací systémy. Pokračoval jsem studiem
             na bakalářského programu Automatizace a měření na VUT v Brně a momentálně studuji poslední ročník magisterského studia oboru Kybernetika.
             Zároveň jsem v prvním ročníku magisterského kombinovaného studia oboru Strategický rozvoj podniku.
-          
         </p>
 
-        <p>
+        <p data-i18n="about.p3">
             I když mi během studia přišla většina předmětů a zaměření zajímavá, nejvíce jsem si oblíbil embedded programování a elektroniku.
             Vždy mě nejvíc bavilo když jsem mohl nabyté znalosti uplatnit v praxi, proto jsem si už od střední začal navrhovat první obvody a
             psát své první programy. V té době většinou na platformě Arduino. I když ne vše skončilo jednoznačným úspěchem, tak můžu říct,
             že jsem se jednoznačně něco naučil.
         </p>
 
-        <p>
+        <p data-i18n="about.p4">
             Důležitý okamžik pro mě byl, když jsem si koupil osciloskop, který mi hlouběji pomohl porozumět, v té době
             zejména analogové elektronice, protože jsem se začal zajímat o audiotechniku a zejména vintage receivery, které jsem začal servisovat a opravovat. Tou dobou jsem si začal zařizovat dílnu, což mi také zabralo nezanedbatelné množství času a můžete ji vidět na obrázku.
         </p>
 
         <img src="dilna.jpg" alt="Moje dílna" style="width: 100%; border-radius: 8px; margin: 16px 0 32px;">
 
-        <p>
+        <p data-i18n="about.p5">
             Během střední školy jsem si přivydělával na stavbě a uklízením, po střední jsem pak pracoval ve firmě Saturn, která se
             věnuje decentralizovaným čističkám odpadních vod a taky internetovým sítím. Také jsem měl
             možnost absolvovat 3 týdenní pracovní stáž v Budapešti ve firmě Power Quattro.
         </p>
-        <p>
+        <p data-i18n="about.p6">
             S nástupem na vysokou školu jsem svůj zájem směřoval opět k digitálním obvodům a objevil mikročipy ESP32, které
             oproti čipům Atmega v Arduinu nabízely mnohem více možností a já pomocí nich realizoval většinu svých projektů.
         </p>
 
-        <p>
+        <p data-i18n="about.p7">
             Mimo školu a elektroniku která je mi i koníčkem, rád hraju na hudební nástroje zejména pak klavír, hře na
             nějž se věnuji od základní školy. Užívám si také cestování — zajímá mě spíš autentická atmosféra málo známých míst než prohlídkové okruhy, ale ze všeho nejraději sdílím tyto chvíle s přáteli. Rád chodím pěšky nebo stopuji.
         </p>
 
-    
-        <p>
+        <p data-i18n="about.p8">
             Dále trávím čas čtením, akvaristikou nebo mě baví i fyzická práce, ze sportů pak lyže, kolo, posilovna a judo.
         </p>
 
-        <p>
+        <p data-i18n-html="about.p9">
             Pokud vás něco
             zaujalo, neváhejte se <a href="index.html#contact">ozvat</a>.
         </p>
 
         <a href="index.html" class="back-link">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 7L7 17M7 17V7M7 17H17"/></svg>
-            Zpět na hlavní stránku
+            <span data-i18n="about.back">Zpět na hlavní stránku</span>
         </a>
     </main>
 
     <footer class="footer">
         <p>&copy; 2026 Marek Tatýrek.</p>
     </footer>
+
+    <script>
+        (function () {
+            var T = {
+                en: {
+                    "nav.about": "About",
+                    "nav.projects": "Projects",
+                    "nav.experience": "Experience",
+                    "nav.contact": "Contact",
+                    "about.page.label": "About",
+                    "about.page.h1": "A few words about me",
+                    "about.p1": "My name is Marek Tatýrek, I\u2019m 24 years old, and I\u2019ve been involved in electronics and programming since primary school.",
+                    "about.p2": "I attended the Secondary Industrial School in Zl\u00EDn, majoring in Electrical Engineering with a focus on automation and security systems. I then continued to a bachelor\u2019s programme in Automation and Measurement at Brno University of Technology, and am currently in the final year of a master\u2019s programme in Cybernetics. Alongside that, I am also in the first year of a combined master\u2019s programme in Strategic Business Development.",
+                    "about.p3": "Although I found most subjects interesting, I developed the strongest passion for embedded programming and electronics. I\u2019ve always enjoyed applying knowledge in practice, so from secondary school I started designing circuits and writing programs \u2014 mostly on Arduino at the time. Not everything ended in clear success, but I definitely learned a lot from it all.",
+                    "about.p4": "A key moment was buying an oscilloscope, which helped me understand electronics much more deeply \u2014 at the time especially analogue, as I had become interested in audio technology and vintage receivers, which I started servicing and repairing. Around that time I also began setting up my workshop, which took considerable time \u2014 you can see it in the photo.",
+                    "about.p5": "During secondary school I earned extra money on construction sites and cleaning. After graduating I worked at Saturn, a company specialising in decentralised wastewater treatment and internet networks. I also had the opportunity to complete a 3-week work placement in Budapest at Power Quattro.",
+                    "about.p6": "When I started university, I redirected my interest to digital circuits and discovered the ESP32 microcontrollers, which offered far more capabilities than the ATmega chips in Arduino, and I used them to realise most of my projects.",
+                    "about.p7": "Outside of school and electronics \u2014 which is also my hobby \u2014 I enjoy playing musical instruments, especially piano, which I\u2019ve been playing since primary school. I also enjoy travelling, drawn more to the authentic atmosphere of lesser-known places than tourist circuits, but most of all I love sharing these moments with friends. I enjoy hiking and hitchhiking.",
+                    "about.p8": "I also spend time reading, fishkeeping, or doing physical work \u2014 for sports: skiing, cycling, gym and judo.",
+                    "about.p9": "If anything caught your interest, don\u2019t hesitate to <a href=\"index.html#contact\">get in touch</a>.",
+                    "about.back": "Back to main page"
+                }
+            };
+
+            var textOrig = new Map();
+            var htmlOrig = new Map();
+
+            function applyLang(lang) {
+                document.querySelectorAll('[data-i18n]').forEach(function (el) {
+                    if (!textOrig.has(el)) textOrig.set(el, el.textContent.trim());
+                    var t = lang === 'en' ? T.en[el.dataset.i18n] : textOrig.get(el);
+                    if (t !== undefined) el.textContent = t;
+                });
+                document.querySelectorAll('[data-i18n-html]').forEach(function (el) {
+                    if (!htmlOrig.has(el)) htmlOrig.set(el, el.innerHTML);
+                    var t = lang === 'en' ? T.en[el.dataset.i18nHtml] : htmlOrig.get(el);
+                    if (t !== undefined) el.innerHTML = t;
+                });
+                var btn = document.getElementById('langBtn');
+                if (btn) btn.textContent = lang === 'cs' ? 'EN' : 'CS';
+                document.documentElement.lang = lang;
+                localStorage.setItem('lang', lang);
+                window._lang = lang;
+                document.title = lang === 'en' ? 'About \u2014 Marek Tatýrek' : 'O mn\u011B \u2014 Marek Tatýrek';
+            }
+
+            window.toggleLang = function () {
+                applyLang(window._lang === 'en' ? 'cs' : 'en');
+            };
+
+            var saved = localStorage.getItem('lang') || 'cs';
+            window._lang = saved;
+            if (saved === 'en') applyLang('en');
+            var btn = document.getElementById('langBtn');
+            if (btn) btn.textContent = saved === 'cs' ? 'EN' : 'CS';
+        })();
+    </script>
 
 </body>
 </html>
