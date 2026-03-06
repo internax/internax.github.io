@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marek Tatýrek — Embedded Engineer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           CSS PROMĚNNÉ (CSS Variables)
+           ============================================
+           Tady si definuješ "globální konstanty" pro celý web.
+           Jako #define v C — změníš na jednom místě, změní se všude.
+        */
+        :root {
+            --color-bg: #FAFAF8;
+            --color-surface: #FFFFFF;
+            --color-text: #1A1A1A;
+            --color-text-secondary: #6B6B6B;
+            --color-accent: #2D5A27;
+            --color-accent-light: #E8F0E6;
+            --color-border: #E8E6E1;
+            --color-border-light: #F0EEEA;
+            --font-display: 'DM Serif Display', Georgia, serif;
+            --font-body: 'DM Sans', -apple-system, sans-serif;
+            --max-width: 960px;
+            --spacing-section: clamp(80px, 12vw, 140px);
+        }
+
+        /* ============================================
+           RESET & ZÁKLAD
+           ============================================
+           Prohlížeče mají default styly (marginy, paddingy...).
+           Tohle je "inicializace" — vynulujeme to a nastavíme vlastní.
+        */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;  /* Plynulé scrollování při kliknutí na odkazy */
+            scroll-padding-top: 80px; /* Offset aby navbar nezakrýval obsah */
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.7;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ============================================
+           NAVIGACE (fixní nahoře)
+           ============================================
+           position: fixed = vždy viditelná nahoře.
+           backdrop-filter: blur = ten moderní "frosted glass" efekt.
+        */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 0 24px;
+            background: rgba(250, 250, 248, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border-light);
+            transition: all 0.3s ease;
+        }
+
+        .nav-inner {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            display: flex;              /* Flexbox = layout systém pro řazení prvků */
+            align-items: center;        /* Vertikální centrování */
+            justify-content: space-between; /* Rozhodí prvky na kraje */
+            height: 64px;
+        }
+
+        .nav-logo {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            color: var(--color-text);
+            text-decoration: none;
+            letter-spacing: -0.01em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;                  /* Mezera mezi položkami */
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            transition: color 0.2s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1.5px;
+            background: var(--color-accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--color-text);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* ============================================
+           HERO SEKCE (úvodní obrazovka)
+           ============================================
+           min-height: 100vh = zabírá celou výšku okna.
+           To je ta velká úvodní sekce co vidíš na moderních webech.
+        */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Dekorativní kruh v pozadí — čistě vizuální prvek */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--color-accent-light) 0%, transparent 70%);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+        }
+
+        .hero-label {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin-bottom: 24px;
+            visibility: hidden;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 6vw, 4.2rem);
+            font-weight: 400;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+            color: var(--color-text);
+            margin-bottom: 24px;
+            visibility: hidden;
+        }
+
+        .hero p {
+            font-size: clamp(1.05rem, 2vw, 1.2rem);
+            color: var(--color-text-secondary);
+            max-width: 540px;
+            line-height: 1.8;
+            visibility: hidden;
+        }
+
+        .hero-cta {
+            margin-top: 40px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .hero-cta.visible {
+            opacity: 1;
+        }
+
+        /* Terminal typing kurzor */
+        .typing-cursor {
+            display: inline-block;
+            color: var(--color-accent);
+            animation: blink 0.7s step-end infinite;
+            font-weight: 400;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* PCB Canvas pozadí — celá stránka */
+        #pcbCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border: none;
+            font-family: var(--font-body);
+        }
+
+        .btn-primary {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #234A1E;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(45, 90, 39, 0.25);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--color-text);
+            transform: translateY(-1px);
+        }
+
+        /* ============================================
+           SPOLEČNÉ SEKCE
+           ============================================ */
+        .section {
+            padding: var(--spacing-section) 24px;
+            max-width: var(--max-width);
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .section-desc {
+            color: var(--color-text-secondary);
+            font-size: 1.05rem;
+            max-width: 520px;
+            line-height: 1.75;
+            margin-bottom: 48px;
+        }
+
+        /* Horizontální linka mezi sekcemi */
+        .divider {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .divider hr {
+            border: none;
+            height: 1px;
+            background: var(--color-border);
+        }
+
+        /* ============================================
+           O MNĚ
+           ============================================ */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;  /* Dva sloupce stejné šířky */
+            gap: 64px;
+            align-items: start;
+        }
+
+        .about-text p {
+            color: var(--color-text-secondary);
+            margin-bottom: 16px;
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        .about-text p:first-child {
+            color: var(--color-text);
+            font-size: 1.08rem;
+        }
+
+        .about-full-width {
+            grid-column: 1 / -1;
+            color: var(--color-text-secondary);
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .skill-tag {
+            padding: 10px 16px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--color-text);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .skill-name {
+            display: block;
+        }
+
+        .skill-desc {
+            position: absolute;
+            left: -1px;
+            right: -1px;
+            top: 100%;
+            background: var(--color-accent-light);
+            border: 1px solid var(--color-accent);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 0 12px;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            font-size: 0.78rem;
+            font-weight: 400;
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+            transition: max-height 0.3s ease, opacity 0.25s ease, padding 0.3s ease;
+            z-index: 10;
+        }
+
+        .skill-tag:hover {
+            border-color: var(--color-accent);
+            background: var(--color-accent-light);
+            border-radius: 8px 8px 0 0;
+            z-index: 11;
+        }
+
+        .skill-tag:hover .skill-desc {
+            max-height: 80px;
+            opacity: 1;
+            padding: 8px 12px;
+        }
+
+        /* ============================================
+           PROJEKTY — kartičky (cards)
+           ============================================
+           Grid layout = mřížkový systém.
+           auto-fill + minmax = automaticky přizpůsobí počet sloupců šířce okna.
+        */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .project-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 32px 28px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--color-accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+            border-color: transparent;
+        }
+
+        .project-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .project-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: var(--color-accent-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .project-card h3 {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .project-card p {
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .project-tags span {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: var(--color-bg);
+            border-radius: 4px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        .project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--color-accent);
+            text-decoration: none;
+            transition: gap 0.2s ease;
+        }
+
+        .project-link:hover {
+            gap: 10px;
+        }
+
+        .project-card {
+            cursor: pointer;
+        }
+
+        /* ============================================
+           PROJECT CARD — image background variant
+           ============================================ */
+        .project-card.has-image {
+            padding: 0;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 400px;
+        }
+
+        .project-card.has-image::before {
+            z-index: 3;
+        }
+
+        .project-card-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .project-card-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .project-card-content {
+            position: relative;
+            z-index: 1;
+            padding: 24px 28px 28px;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .project-card-content::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 0 0 12px 12px;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.35) 25%,
+                rgba(255, 255, 255, 0.55) 100%
+            );
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 30%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%);
+            z-index: -1;
+        }
+
+        .project-card.has-image .project-icon {
+            display: none;
+        }
+
+        .project-card.has-image .project-card-content h3,
+        .project-card.has-image .project-card-content p {
+            color: #FFFFFF;
+        }
+
+        .project-card.has-image .project-tags span {
+            background: rgba(255, 255, 255, 0.45);
+            color: var(--color-text);
+        }
+
+        /* ============================================
+           MODAL
+           ============================================ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 24px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: var(--color-surface);
+            border-radius: 16px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.95) translateY(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--color-bg);
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-secondary);
+            transition: background 0.2s ease;
+            z-index: 1;
+        }
+
+        .modal-close:hover {
+            background: var(--color-border);
+        }
+
+        .modal-body {
+            padding: 40px 36px;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 400;
+            margin-bottom: 24px;
+            letter-spacing: -0.01em;
+        }
+
+        .modal-gallery {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            margin-bottom: 24px;
+            padding-bottom: 8px;
+        }
+
+        .modal-gallery:empty {
+            display: none;
+        }
+
+        .modal-gallery img {
+            height: 200px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-gallery img:hover {
+            opacity: 0.85;
+        }
+
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            cursor: zoom-out;
+            padding: 24px;
+        }
+
+        .lightbox.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .lightbox img {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .lightbox.active img {
+            transform: scale(1);
+        }
+
+        .modal-description {
+            color: var(--color-text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        .modal-description p {
+            margin-bottom: 12px;
+        }
+
+        .modal-description p:last-child {
+            margin-bottom: 0;
+        }
+
+        .modal-tags {
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-body {
+                padding: 32px 20px;
+            }
+
+            .modal-gallery img {
+                height: 160px;
+            }
+        }
+
+        /* ============================================
+           ZKUŠENOSTI — timeline
+           ============================================
+           Vertikální čára nalevo + tečky = vizuální timeline.
+           Používáme border-left a ::before pseudo-element pro tečku.
+        */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 1px;
+            background: var(--color-border);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 48px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        /* Tečka na timeline */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -36px;
+            top: 8px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--color-accent);
+            border: 2px solid var(--color-bg);
+        }
+
+        .timeline-date {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--color-accent);
+            letter-spacing: 0.04em;
+            margin-bottom: 6px;
+        }
+
+        .timeline-item h3 {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 400;
+            margin-bottom: 4px;
+        }
+
+        .timeline-item .company {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .timeline-item p {
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            max-width: 480px;
+        }
+
+        /* ============================================
+           KONTAKT
+           ============================================ */
+        .contact-section {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            padding: clamp(40px, 6vw, 64px);
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .contact-section .section-title {
+            margin-bottom: 12px;
+        }
+
+        .contact-section .section-desc {
+            margin: 0 auto 36px;
+            text-align: center;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 24px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--color-text);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            background: var(--color-bg);
+        }
+
+        .contact-link:hover {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        }
+
+        .contact-link svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        .footer {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--color-text-secondary);
+            font-size: 0.825rem;
+        }
+
+        /* ============================================
+           ANIMACE
+           ============================================
+           @keyframes = definice animace (jako lookup table).
+           Prohlížeč interpoluje mezi stavy.
+        */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Třída pro scroll-triggered animace (přidáváme přes JS) */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered reveal pro skill tagy */
+        .skill-tag {
+            opacity: 0;
+            transform: translateY(10px) scale(0.92);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .skill-tag.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* ============================================
+           RESPONZIVNÍ DESIGN (media queries)
+           ============================================
+           @media = podmínka pro šířku obrazovky.
+           Jako #ifdef pro různé platformy — jiný layout na mobilu.
+        */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;  /* Na mobilu schováme menu (zjednodušení) */
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;  /* Na mobilu jeden sloupec */
+                gap: 40px;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .contact-links {
+                flex-direction: column;
+                align-items: center;
+            }
+
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================
+         NAVIGACE
+         ==========================================
+         Odkazy s # odkazují na sekce na stejné stránce (id atribut).
+         scroll-behavior: smooth v CSS zajistí plynulý scroll.
+    -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="#" class="nav-logo">Marek Tatýrek</a>
+            <ul class="nav-links">
+                <li><a href="#about">O mně</a></li>
+                <li><a href="#projects">Projekty</a></li>
+                <li><a href="#experience">Zkušenosti</a></li>
+                <li><a href="#contact">Kontakt</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ==========================================
+         HERO — první co uživatel vidí
+         ========================================== -->
+    <canvas id="pcbCanvas"></canvas>
+
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-label">Embedded Engineer</span>
+            <h1>Ahoj, jsem<br>Marek Tatýrek</h1>
+            <p>
+                Vyvíjím hardware a firmware, baví mě spojení těchto dvou neoddělitelných světů.
+            </p>
+            <div class="hero-cta">
+                <a href="#projects" class="btn btn-primary">
+                    Moje projekty
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+                </a>
+                <a href="#contact" class="btn btn-secondary">Kontaktujte mě</a>
+                <a href="about.html" class="btn btn-secondary">Více o mně</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"><hr></div>
+
+    <!-- ==========================================
+         O MNĚ
+         ========================================== -->
+    <section class="section" id="about">
+        <div class="reveal">
+            <span class="section-label">O mně</span>
+            <div class="about-grid">
+                <div class="about-text">
+                    <p>
+                        Jsem student 2. ročníku magisterského studia oboru <a href="https://www.vut.cz/studenti/programy/program/9479" target="_blank">kybernetka, automatizace a měření</a>.
+                        Zajímá mě propojení mezi hardwarem a softwarem, proto se zabývám zejména PCB designem a embedded programováním.
+                        Věci si rád ověřuji praxí, proto jsem si postavil malou laboratoř a své studium doplňoval projekty, na kterých jsem se toho spoustu naučil.
+                        Vedle toho studuji <a href="https://www.vut.cz/studenti/programy/program/9373" target="_blank">management a ekonomii</a>.
+                    </p>
+                </div>
+                <div>
+                    <div class="skills-grid">
+                        <div class="skill-tag">
+                            <span class="skill-name">C / C++</span>
+                            <span class="skill-desc">Firmware pro STM32, ESP32 — práce s registry, HAL, RTOS.</span>
+                        </div>
+                        <div class="skill-tag">
+                            <span class="skill-name">IoT - Matter</span>
+                            <span class="skill-desc">Protokol Matter, Thread, integrace do chytré domácnosti.</span>
+                        </div>
+                        <div class="skill-tag">
+                            <span class="skill-name">Python</span>
+                            <span class="skill-desc">Skripty, automatizace, zpracování dat, testování.</span>
+                        </div>
+                        <div class="skill-tag">
+                            <span class="skill-name">ESP32, STM32, nRF52</span>
+                            <span class="skill-desc">Vývoj na ARM Cortex-M a Xtensa platformách.</span>
+                        </div>
+                        <div class="skill-tag">
+                            <span class="skill-name">Matlab</span>
+                            <span class="skill-desc">Simulace, modelování systémů, zpracování signálů.</span>
+                        </div>
+                        <div class="skill-tag">
+                            <span class="skill-name">PCB Design</span>
+                            <span class="skill-desc">Návrh schémat a layoutu v KiCadu, osazování.</span>
+                        </div>
+                        <div class="skill-tag">
+                            <span class="skill-name">VHDL</span>
+                            <span class="skill-desc">Návrh digitálních obvodů pro FPGA.</span>
+                        </div>
+                        <div class="skill-tag">
+                            <span class="skill-name">3D modeling</span>
+                            <span class="skill-desc">Modelování krabic a dílů pro 3D tisk.</span>
+                        </div>
+                        <div class="skill-tag">
+                            <span class="skill-name">Git</span>
+                            <span class="skill-desc">Verzování kódu, branching, code review.</span>
+                        </div>
+                        <div class="skill-tag">
+                            <span class="skill-name">Energy Harvesting</span>
+                            <span class="skill-desc">Napájení IoT zařízení z okolní energie.</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="about-full-width">
+                    Mám zkušenost od návrhu schémat a layoutu desky, přes nízkoúrovňové programování na úrovni registrů, komunikační protokoly až po RTOS.
+                    Mé pozornosti se zvlášť těší IoT a chytrá domácnost, kterými jsem se zabýval v podobě protokolu Matter jak ve své <a href="https://dspace.vut.cz/items/0862d79d-6370-4411-a905-91d1db68de6f" target="_blank">bakalářské</a>,
+                    tak i diplomové práci.
+                    Myslím si, že nejlepší ukázkou toho co umím jsou některé z <a href="#projects">mých projektů</a>.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"><hr></div>
+
+    <!-- ==========================================
+         PROJEKTY
+         ========================================== -->
+    <section class="section" id="projects">
+        <div class="reveal">
+            <span class="section-label">Projekty</span>
+            <h2 class="section-title">Na čem pracuji</h2>
+            <p class="section-desc">
+                Výběr pro mě nejzajímavějších projektů, které jsem dělal.
+            </p>
+        </div>
+        <div class="projects-grid">
+            <div class="project-card reveal"
+                 data-title="Řídící systém akvárií"
+                 data-description="&lt;p&gt;Akvaristika mě baví už od mala, nicméně jsem poměrně líný akvarista — i když se na akvárium rád dívám, tak mě nebaví pravidelně
+                 do něj zasahovat, což byl důvod, proč se vrhnout do tohoto projektu. Jako předchůdce tohoto projektu byl kontroler založený na Arduinu Nano, který ač spolehlivě
+                 ovládal pouze světla bez možnosti pohodlného uživatelského zásahu a navíc se zpožďoval. Proto jsem se rozhodl v rámci bakalářské práce udělat lepší
+                 řešení. &lt;/p&gt;
+                 &lt;p&gt;V době, kdy jsem chtěl začít na práci pracovat, zrovna vyšel nový standard Matter ve verzi 1.0 a po konzultaci s vedoucím jsme se domluvili, že 
+                 se jej pokusím i přes velkou nezralost implementovat. Což se nakonec i přes spoustu problémů povedlo, i když například cluster pro měření CO2 Apple
+                 ekosystém, ve kterém jsem zařízení testoval, nepodporoval, i přesto že v oficiální specifikaci dostupný byl.&lt;/p&gt;
+
+                 &lt;p&gt;Konečná podoba zařízení umožňovala nastavování světel, a to jak hlavních pro růst rostlin, tak i RGB pro vyniknutí
+                 barev akvarijních rybek, monitorování a nastavování teploty v akváriu, monitorování úrovně CO2 v akváriu a případnou regulaci pomocí spínání ventilu.&lt;/p&gt;
+
+                 &lt;p&gt;I přes problémy danými hlavně nezralostí standardu Matter jsem zadání bakalářské práce splnil a obdržel hodnocení A.&lt;/p&gt;
+                 "
+
+                 
+                 data-images='["akvarko.jpg","akvarko_homekit.png"]'
+                 data-tags="Matter,ESP32,PCB"
+                 data-link="#">
+                <div class="project-icon">🐟</div>
+                <h3>Řídící systém akvárií</h3>
+                <p>Zajímám se o akvaristiku, kterou jsem v tomto projektu zkloubil se svou zálibou
+                 v chytrých domácnostech. Výsledkem je zařízení pro řízení akvária, které lze jako komponentu přidat do
+                 libovolného systému smart home.</p>
+                <div class="project-tags">
+                    <span>Matter</span>
+                    <span>ESP32</span>
+                    <span>PCB</span>
+                </div>
+            </div>
+
+            <div class="project-card reveal"
+                 data-title="Zesilovač"
+                 data-description="
+                 &lt;p&gt;Jak už jsem zmiňoval, postavit si svůj vlastní zesilovač byl dlouhou dobu můj sen i proto, že jsem se na střední věnoval opravám zejména
+                 vintage receiverů. Do stavby jsem se pustil někdy kolem roku 2024 a spolupracoval jsem při tom s kamarádem. Zesilovač disponuje 7 pásmovým ekvalizérem,
+                 výkonem koncového stupně 50W, nízkým harmonickým zkreslením a šumovým pozadím. Co se napájecí části týče, je vybaven soft start funkcí, standby režimem,
+                 hlídáním stejnosměrné složky na výstupu reproduktoru, detekcí ztráty napájení. Díky tomu je zapnutí a vypnutí plynulé bez jakéhokoli praskání.
+                 Zároveň bylo myšleno i na EMC, proto je přístroj vybavený i vstupními filtry a obvodem pro odrušení soufázového rušení.
+                 V blízké budoucnosti je také plánované doplnění konektivity jako je AirPlay, Bluetooth atd.&lt;/p&gt;
+                 &lt;p&gt; Zesilovač je postaven okolo signálového procesoru MAX98080 integrovaných koncových stupňů ve třídě AB, LM3886. Jako řídicí
+                 čip byl opět vybrán ESP32-S3, který komunikuje s DSP pomocí I2C pro programování čipu a I2S pro přenášení hudby.&lt;/p&gt;
+
+                 &lt;p&gt;Co zatím na samotné konstrukci chybí je přední panel, který je třeba smontovat a připevnit. Zajímavým prvkem na panelu
+                 je zobrazovací jednotka, která je kombinací E-ink displeje a klasického VU metru. Přičemž běžně funguje zobrazovač jako indikace aktuálního vybuzení
+                 reproduktorů a v případě potřeby jako rozhraní pro nastavení požadovaných parametrů zesilovače. Výhoda tohoto řešení je to, že samotný E-ink
+                 displej má poměrně pomalou odezvu a použití ručky, která má dynamiku naopak relativně velkou, dosáhneme příjemné odezvy a navíc i analogového pocitu,
+                 který mě osobně v dnešní době plné svítících zobrazovačů trochu chybí.&lt;/p&gt;
+
+                 &lt;p&gt;Ze samotného procesu bych jako nejnáročnější část vypíchl programování DSP. Jelikož nebyla dostupná žádná knihovna, kterou bych
+                 mohl použít, ponořil jsem se do studia datasheetu a knihovnu jsem si napsal. Tím jsem se mnohému naučil, ale zároveň mě to stálo spoustu úsilí.
+                 Dalšími částmi, na kterých jsem pracoval já, byl návrh hlavní desky s DSP, ESP, koncové stupně, návrh řízení E-ink displeje, návrh spínaného zdroje a kovová konstrukce.
+                 Kolega měl pak na starosti návrh napájecí části, ochrany, rozhraní a 3D tisk krytů.&lt;/p&gt;
+                 "
+                 data-images='["zesilovac.jpg", "eink.jpg"]'
+                 data-tags="Analog,Audio,PCB,ESP32"
+                 data-link="#">
+                <div class="project-icon">🔊</div>
+                <h3>Zesilovač</h3>
+                <p>Tímto projektem jsem si splnil svůj sen ze střední školy. Od píky jsem si postavil
+                    zesilovač ve třídě AB se signálovým procesorem. Jedná se o projekt kterému jsem dal
+                    nejvíc času a zároveň je asi mým nejoblíbenějším.
+                </p>
+                <div class="project-tags">
+                    <span>Analog</span>
+                    <span>Audio</span>
+                    <span>PCB</span>
+                    <span>ESP32</span>
+                </div>
+            </div>
+
+            <div class="project-card reveal"
+                 data-title="Energy harvesting vypínač"
+                 data-description="&lt;p&gt;Jelikož mě v poslední době čím dál více zajímá IoT a to, jak tyto technologie dostat tam, kde s nimi nebylo původně počítáno, přijde
+                 mi využití energy harvestingu velmi zajímavé. Cílem práce je navrhnout energy harvester, který má jako zdroj energie kinetický harvester.
+                 Z této energie pak vyslat signál nadřazenému systému, který budu také implementovat a který se bude chovat jako Matter bridge a přenese informaci o změně stavu komponenty
+                 do ekosystému chytré domácnosti. Párování bude probíhat pomocí NFC.&lt;/p&gt;
+                 
+                 &lt;p&gt;Jedná se o práci, na které teď dělám. Aktuálně jsem ve stavu, že mám hotový energy harvester, který pomocí BT komunikuje prozatím s počítačem.
+                 Harvester je postaven na čipu nRF52832, který je známý svou nízkou spotřebou. Zajímavou věcí, kterou jsem v tomto projektu řešil, bylo třeba to, že i když
+                 má SDK od nRF velmi dobře napsaný BT stack, jeho inicializace je v měřítku získané energie velmi drahá, proto jsem si musel napsat vlastní jednoduchý ovladač
+                 pro vysílání přes BT. Nyní pracuji na Matter bridge části.&lt;/p&gt;
+                "
+                 data-images='["harvester.jpg"]'
+                 data-tags="Matter,NFC,nRF52,ESP32"
+                 data-link="#">
+                <div class="project-icon">🔋</div>
+                <h3>Energy harvesting vypínač</h3>
+                <p>Touto prací jsem se pustil do neprobádaných vod ultra low power a NFC. Vypracování
+                    je zároveň tématem mé diplomové práce. 
+                </p>
+                <div class="project-tags">
+                    <span>Matter</span>
+                    <span>NFC</span>
+                    <span>nRF52</span>
+                    <span>ESP32</span>
+                </div>
+            </div>
+
+            
+
+            <div class="project-card reveal"
+                 data-title="Lampička za monitor"
+                 data-description="
+                 &lt;p&gt;Abych projekt trochu přiblížil, jedná se o lampičku za monitor s uchycením typicky za VESA držák s vlastním napájením z 8-28 V.&lt;/p&gt;
+                 &lt;p&gt;Konstrukce lampičky měla dvě části, tu elektronickou a tu mechanickou. I když si myslím, že ta co se elektroniky týče byla
+                 složitější, pro mě byla větší výzvou ta mechanická a zejména pak návrh a tisk kloubu.&lt;/p&gt;
+                 &lt;p&gt;Elektronika je postavena na ESP32-S3 a k řízení jsem si navrhl jednoduchou destičku o rozměrech 30 x 35 mm, která na sobě krom ESP
+                 má ještě napájecí obvody řešené step-downem z 24 V na 5 V a 3,3V LDO k napájení čipu. Dále pak 2kanálový PWM výstup na řízení LED a vstup na enkodér.&lt;/p&gt;
+                 &lt;p&gt;Ovládání je řešeno rotačním enkodérem umístěným v těle lampičky, druhá možnost je přes chytrou domácnost, například pomocí hlasového asistenta. Výhodou
+                 tohoto spojení je to, že lze používat některé zajímavé funkce, jako například úpravu chromatičnosti v závislosti na denní době či různé automatizace.&lt;/p&gt;
+                 &lt;p&gt;Mechanická část byla výzvou zejména z hlediska pevnosti dílů tištěných na 3D tiskárně. Lampička má dva nastavitelné klouby a já jsem hledal
+                 dobrý poměr mezi vzhledem a pevností kloubů. Jelikož jsem lampičku dělal hlavně pro sebe, zvolil jsem řešení, které se mi líbilo víc, i za cenu větší křehkosti.&lt;/p&gt;
+                 &lt;p&gt;V tuto chvíli už mi lampička spolehlivě slouží 3. rokem bez jakýchkoli problémů.&lt;/p&gt;
+                 "
+                 data-images='["lampicka.jpg"]'
+                 data-tags="Matter,ESP,3D tisk"
+                 data-link="#">
+                <div class="project-icon">💡</div>
+                <h3>Lampička za monitor</h3>
+                <p>Tímto jednoduchým projektem jsem vyřešil svůj problém s nedostatečně a nerovnoměrně osvícenou
+                    pracovní plochou. Vyrobil jsem si lampičku s nastavitelnou chromatičností a jasem, opět nechybí
+                    ani integrace do chytré domácnosti.
+                </p>
+                <div class="project-tags">
+                    <span>Matter</span>
+                    <span>ESP</span>
+                    <span>3D tisk</span>
+                </div>
+            </div>
+
+            <div class="project-card reveal"
+                 data-title="Výškově nastavitelný stůl"
+                 data-description="&lt;p&gt;Stoly, které jsem měl tu možnost vidět na vlastní oči, mi vždy připadaly poměrně vachrlaté a celkově se mi nelíbil jejich design. Navíc nenabízejí možnosti integrace do chytré domácnosti. Proto jsem se rozhodl pro konstrukci vlastního stolu. Řešení je postavené okolo čipu ESP32-S3, k řízení motorů je pak použit čip DRV8873. Pro samotnou fyzickou konstrukci jsem zvolil svařovaný rám.&lt;/p&gt;
+                 &lt;p&gt;Aktuálně má stůl všechny funkce, kterými disponuje běžný komerční stůl — ochrany, paměťové pozice, kalibrace a manuální režim. HW je navržený s rezervou pro další funkce, které postupně doplňuji: chytrá konektivita, pokročilejší ovládací rozhraní, připojení senzorů (kvalita vzduchu, teplota) a PWM výstup pro napájení LED pásku.&lt;/p&gt;
+                 &lt;p&gt;Na tomto projektu spolupracuji s kolegou, který se zasloužil o návrh HW, přičemž já mám na starosti FW. Na konstrukci samotné jsme pak pracovali společně.&lt;/p&gt;"
+                 data-images='["hat.jpg"]'
+                 data-tags="FW,Konstrukce"
+                 data-link="#">
+                <div class="project-icon">🪑</div>
+                <h3>Výškově nastavitelný stůl</h3>
+                <p>Vážím si svého zdraví a vzhledem kolik času strávím sezením, rozhodl jsem se postavit si vlastní stůl se svařovaným rámem,
+                    řízením motorů přes DRV8873 a firmware na ESP32-S3. V plánu je i integrace do chytré domácnosti.
+                </p>
+                <div class="project-tags">
+                    <span>FW</span>
+                    <span>Konstrukce</span>
+                </div>
+            </div>
+
+            <div class="project-card reveal"
+                 data-title="Reproduktory a basová jednotka"
+                 data-description="&lt;p&gt;Tomuto projektu jsem se věnoval během covidu. Tou dobou jsem si zrovna zařizoval dílnu a chyběly mi zde reproduktory.
+                 Jako první jsem si postavil pár pasivních reproduktorů s impedancí 8 ohm a max výkonem 100W.&lt;/p&gt;
+                 &lt;p&gt;Jelikož si na kvalitní audio poměrně potrpím, věnoval jsem studiu reprosoustav poměrně dost úsilí. V tom mi pomohla kniha Reproduktory a reprosoustavy od Kamila Tomana z firmy Dexon.
+                 Zjistil jsem, že samotný návrh může být poměrně komplexní a i malé detaily můžou hrát velkou roli, natož pak ty velké, jako je materiál či velikost reproduktoru.
+                 Nakonec jsem se rozhodl pro otevřenou konstrukci s bass reflexem. Jako materiál jsem zvolil MDF kvůli dobrým tlumícím vlastnostem a absenci nežádoucích rezonancí,
+                 desky si nařezal a spojil lepením na koso. Samotné měniče jsem koupil u firmy Dexon. Výhybku jsem si také navrhl a vyleptal sám.&lt;/p&gt;
+                 &lt;p&gt;I když je líbivost zvukového projevu individuální, já mohu říci, že jsem spokojen zejména příjemnou basovou složkou, která je
+                 vzhledem k velikosti reproduktorů příjemně plná.&lt;/p&gt;
+                 &lt;p&gt;Při konstrukci aktivní basové jednotky se ke mně přidal kamarád, se kterým jsem později spolupracoval i na zesilovači. Fyzická
+                 stránka byla velmi podobná stavbě reproduktorů, opět podložená i výpočtem. Výzvou byla v tomto případě stavba zesilovače a korekcí. Jako zesilovač
+                 samotný v tomto případě posloužil koupený modul a my se věnovali hlavně stavbě předzesilovače. Předzesilovač v sobě má nastavení dolní propusti, notch filtr
+                 pro omezení nežádoucí rezonance v místnosti, slučovač kanálů a samozřejmě i nastavení hlasitosti a automatický standby režim. V tomto projektu jsme narazili
+                 na problémy s kmitáním některých obvodů postavených na operačních zesilovačích NE5532 — příčinou bylo nevhodné rozmístění komponent na PCB.
+                 Tato zkušenost mě naučila, jak zásadní roli hraje layout desky.&lt;/p&gt;
+                 "
+                 data-images='["repraky.jpg"]'
+                 data-tags="Audio,Konstrukce,Design"
+                 data-link="#">
+                <div class="project-icon">🎵</div>
+                <h3>Reproduktory a basová jednotka</h3>
+                <p>Jeden z mých prvních projektů, byla stavba reproduktorů a basové jednotky,
+                    které používám dodnes.
+                </p>
+                <div class="project-tags">
+                    <span>Audio</span>
+                    <span>Konstrukce</span>
+                    <span>Design</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"><hr></div>
+
+    <!-- ==========================================
+         ZKUŠENOSTI — timeline
+         ========================================== -->
+    <section class="section" id="experience">
+        <div class="reveal">
+            <span class="section-label">Zkušenosti</span>
+            <h2 class="section-title">Kde jsem pracoval</h2>
+           
+        </div>
+        <div class="timeline reveal">
+
+            <div class="timeline-item">
+                <div class="timeline-date">2024 — současnost</div>
+                <h3>Magisterské studium</h3>
+                <div class="company">VUT Brno</div>
+                <p>
+                    Kybernetika, automatizace a měření (FEKT) a Management a ekonomie (FP).
+                </p>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-date">2025</div>
+                <h3>Erasmus</h3>
+                <div class="company">Università degli Studi di Padova</div>
+                <p>
+                    Semestrální studijní pobyt v Itálii.
+                </p>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-date">2021 — 2024</div>
+                <h3>Bakalářské studium</h3>
+                <div class="company">VUT Brno</div>
+                <p>
+                    Automatizace a měřicí technika, FEKT.
+                </p>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-date">2017 — 2021</div>
+                <h3>Opravy vintage audio receiverů</h3>
+                <p>
+                    Servis a opravy analogových audio receiverů během střední školy.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <div class="divider"><hr></div>
+
+    <!-- ==========================================
+         KONTAKT
+         ========================================== -->
+    <section class="section" id="contact">
+        <div class="contact-section reveal">
+            <span class="section-label">Kontakt</span>
+            <h2 class="section-title">Ozvěte se mi</h2>
+            <p class="section-desc">
+                Máte projekt, nápad, nebo se chcete jen spojit?
+                Napište mi.
+            </p>
+            <div class="contact-links">
+                <a href="mailto:matatyrek@gmail.com" class="contact-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13L2 4"/></svg>
+                    matatyrek@gmail.com
+                </a>
+                <a href="https://github.com/vasucet" target="_blank" class="contact-link">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    GitHub
+                </a>
+                <a href="https://linkedin.com/in/vasucet" target="_blank" class="contact-link">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    LinkedIn
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         FOOTER
+         ========================================== -->
+    <footer class="footer">
+        <p>&copy; 2026 Marek Tatýrek.</p>
+    </footer>
+
+    <!-- ==========================================
+         MODAL — detail projektu
+         ========================================== -->
+    <div class="modal-overlay" id="projectModal">
+        <div class="modal">
+            <button class="modal-close">&times;</button>
+            <div class="modal-body">
+                <h2 class="modal-title"></h2>
+                <div class="modal-gallery"></div>
+                <div class="modal-description"></div>
+                <div class="project-tags modal-tags"></div>
+                <a href="#" class="project-link modal-link" target="_blank">
+                    Zobrazit na GitHubu
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="lightbox" id="lightbox">
+        <img src="" alt="">
+    </div>
+
+    <!-- ==========================================
+         JAVASCRIPT
+         ==========================================
+         Jediný JS na stránce — Intersection Observer.
+         
+         Funguje jako "interrupt" — prohlížeč ti dá callback když
+         element vstoupí do viewportu (viditelné oblasti).
+         Používáme to pro animace při scrollování.
+    -->
+    <script>
+        // ============================================
+        // Injekce obrázků do karet projektů
+        // ============================================
+        (function() {
+            document.querySelectorAll('.project-card').forEach(card => {
+                const imagesAttr = card.dataset.images;
+                if (!imagesAttr) return;
+
+                let images;
+                try {
+                    images = JSON.parse(imagesAttr);
+                } catch (e) {
+                    return;
+                }
+
+                if (!Array.isArray(images) || images.length === 0) return;
+
+                card.classList.add('has-image');
+
+                const bgDiv = document.createElement('div');
+                bgDiv.className = 'project-card-bg';
+                const img = document.createElement('img');
+                img.src = images[0];
+                img.alt = card.dataset.title || '';
+                img.loading = 'lazy';
+                bgDiv.appendChild(img);
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'project-card-content';
+
+                while (card.firstChild) {
+                    contentDiv.appendChild(card.firstChild);
+                }
+
+                card.appendChild(bgDiv);
+                card.appendChild(contentDiv);
+            });
+        })();
+
+        // Intersection Observer — "watchdog" pro viditelnost elementů
+        // Podobné jako polling, ale prohlížeč to řeší efektivně interně
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    // entry.isIntersecting = true když element je vidět
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target); // Odpojíme po prvním triggeru
+                    }
+                });
+            },
+            {
+                threshold: 0.1,   // Trigger když je 10% elementu vidět
+                rootMargin: '0px 0px -50px 0px' // Offset zdola (trigger o 50px dřív)
+            }
+        );
+
+        // Najdeme všechny elementy s třídou "reveal" a napojíme observer
+        document.querySelectorAll('.reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Staggered reveal pro skill tagy — vlastní observer na skills-grid
+        const skillObserver = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const tags = entry.target.querySelectorAll('.skill-tag');
+                        tags.forEach((tag, i) => {
+                            tag.style.transitionDelay = `${i * 0.07}s`;
+                            tag.classList.add('visible');
+                        });
+                        skillObserver.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.2, rootMargin: '0px 0px -30px 0px' }
+        );
+
+        document.querySelectorAll('.skills-grid').forEach(grid => {
+            skillObserver.observe(grid);
+        });
+
+
+        // Efekt navigace — přidáme stín když scrollneme dolů
+        const nav = document.querySelector('.nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.style.boxShadow = '0 1px 12px rgba(0,0,0,0.04)';
+            } else {
+                nav.style.boxShadow = 'none';
+            }
+        });
+
+        // Modal — detail projektu
+        const modal = document.getElementById('projectModal');
+        const modalTitle = modal.querySelector('.modal-title');
+        const modalGallery = modal.querySelector('.modal-gallery');
+        const modalDesc = modal.querySelector('.modal-description');
+        const modalTags = modal.querySelector('.modal-tags');
+        const modalLink = modal.querySelector('.modal-link');
+
+        function openModal(card) {
+            modalTitle.textContent = card.dataset.title;
+            modalDesc.innerHTML = card.dataset.description;
+
+            // Galerie obrázků
+            modalGallery.innerHTML = '';
+            const images = JSON.parse(card.dataset.images || '[]');
+            images.forEach(src => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = card.dataset.title;
+                modalGallery.appendChild(img);
+            });
+
+            // Tagy
+            modalTags.innerHTML = '';
+            card.dataset.tags.split(',').forEach(tag => {
+                const span = document.createElement('span');
+                span.textContent = tag.trim();
+                modalTags.appendChild(span);
+            });
+
+            // Odkaz na GitHub
+            const link = card.dataset.link;
+            if (link && link !== '#') {
+                modalLink.href = link;
+                modalLink.style.display = 'inline-flex';
+            } else {
+                modalLink.style.display = 'none';
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Klik na project card otevře modal
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                // Neklikáme na odkaz uvnitř karty
+                if (e.target.closest('a')) return;
+                openModal(card);
+            });
+        });
+
+        // Zavření modalu
+        modal.querySelector('.modal-close').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (lightbox.classList.contains('active')) {
+                    lightbox.classList.remove('active');
+                } else {
+                    closeModal();
+                }
+            }
+        });
+
+        // Lightbox — zvětšení obrázku z galerie
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = lightbox.querySelector('img');
+
+        modalGallery.addEventListener('click', (e) => {
+            if (e.target.tagName === 'IMG') {
+                lightboxImg.src = e.target.src;
+                lightboxImg.alt = e.target.alt;
+                lightbox.classList.add('active');
+            }
+        });
+
+        lightbox.addEventListener('click', () => {
+            lightbox.classList.remove('active');
+        });
+
+        // ============================================
+        // PCB Canvas — interaktivní pozadí celé stránky
+        // ============================================
+        (function() {
+            const canvas = document.getElementById('pcbCanvas');
+            const ctx = canvas.getContext('2d');
+            let mouse = { x: 0, y: 0 };
+            let mouseStrength = 0;     // 0 = žádný efekt, 1 = plný efekt
+            let targetStrength = 0;
+            let nodes = [];
+            const NODE_COUNT = 90;
+            const CONNECT_DIST = 150;
+            const MOUSE_RADIUS = 200;
+
+            // Tagy které považujeme za "prázdné pozadí"
+            const bgTags = new Set(['SECTION', 'BODY', 'HTML', 'CANVAS', 'HR']);
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            function initNodes() {
+                nodes = [];
+                for (let i = 0; i < NODE_COUNT; i++) {
+                    nodes.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        vx: (Math.random() - 0.5) * 0.3,
+                        vy: (Math.random() - 0.5) * 0.3,
+                        r: Math.random() * 2 + 1.5
+                    });
+                }
+            }
+
+            function checkBackground() {
+                const el = document.elementFromPoint(mouse.x, mouse.y);
+                const onBg = !el || bgTags.has(el.tagName) || el.classList.contains('divider') || el.classList.contains('hero');
+                targetStrength = onBg ? 1 : 0;
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Plynulá interpolace síly efektu
+                mouseStrength += (targetStrength - mouseStrength) * 0.06;
+
+                // Propojení uzlů čárami
+                for (let i = 0; i < nodes.length; i++) {
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const dx = nodes[i].x - nodes[j].x;
+                        const dy = nodes[i].y - nodes[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist > CONNECT_DIST) continue;
+
+                        const opacity = 1 - dist / CONNECT_DIST;
+
+                        const midX = (nodes[i].x + nodes[j].x) / 2;
+                        const midY = (nodes[i].y + nodes[j].y) / 2;
+                        const mouseDist = Math.sqrt((midX - mouse.x) ** 2 + (midY - mouse.y) ** 2);
+                        const nearness = mouseDist < MOUSE_RADIUS ? (1 - mouseDist / MOUSE_RADIUS) * mouseStrength : 0;
+
+                        ctx.beginPath();
+                        ctx.moveTo(nodes[i].x, nodes[i].y);
+
+                        // PCB styl — pravoúhlé čáry (90° zatáčky)
+                        if (Math.abs(dx) > Math.abs(dy)) {
+                            ctx.lineTo(nodes[j].x, nodes[i].y);
+                            ctx.lineTo(nodes[j].x, nodes[j].y);
+                        } else {
+                            ctx.lineTo(nodes[i].x, nodes[j].y);
+                            ctx.lineTo(nodes[j].x, nodes[j].y);
+                        }
+
+                        // Interpolace mezi šedou a zelenou barvou
+                        const r = Math.round(200 - nearness * 155);
+                        const g = Math.round(195 - nearness * 105);
+                        const b = Math.round(188 - nearness * 149);
+                        const a = opacity * (0.3 + nearness * 0.1);
+                        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
+                        ctx.lineWidth = 0.8 + nearness * 0.7;
+                        ctx.stroke();
+                    }
+                }
+
+                // Uzly (pads)
+                for (const node of nodes) {
+                    const dx = node.x - mouse.x;
+                    const dy = node.y - mouse.y;
+                    const mouseDist = Math.sqrt(dx * dx + dy * dy);
+                    const proximity = mouseDist < MOUSE_RADIUS ? (1 - mouseDist / MOUSE_RADIUS) * mouseStrength : 0;
+
+                    ctx.beginPath();
+                    const r = node.r + proximity * 2;
+                    ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
+
+                    const cr = Math.round(200 - proximity * 155);
+                    const cg = Math.round(195 - proximity * 105);
+                    const cb = Math.round(188 - proximity * 149);
+                    ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${0.4 + proximity * 0.4})`;
+                    ctx.fill();
+
+                    // Pohyb uzlů (pomalý drift)
+                    node.x += node.vx;
+                    node.y += node.vy;
+                    if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
+                    if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
+                }
+
+                requestAnimationFrame(draw);
+            }
+
+            document.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+                checkBackground();
+            });
+
+            window.addEventListener('scroll', checkBackground, { passive: true });
+
+            window.addEventListener('resize', () => {
+                resize();
+                initNodes();
+            });
+
+            resize();
+            initNodes();
+            draw();
+        })();
+
+        // ============================================
+        // Terminal typing efekt — hero text
+        // ============================================
+        (function() {
+            const label = document.querySelector('.hero-label');
+            const h1 = document.querySelector('.hero h1');
+            const p = document.querySelector('.hero p');
+            const cta = document.querySelector('.hero-cta');
+
+            // Uložíme původní obsah
+            const labelText = label.textContent;
+            const h1HTML = h1.innerHTML;
+            const pText = p.textContent;
+
+            // Kurzor element
+            const cursor = document.createElement('span');
+            cursor.className = 'typing-cursor';
+            cursor.textContent = '▌';
+
+            function typeText(element, text, speed) {
+                return new Promise(resolve => {
+                    element.textContent = '';
+                    element.style.visibility = 'visible';
+                    element.appendChild(cursor);
+                    let i = 0;
+
+                    function tick() {
+                        if (i < text.length) {
+                            // Vložit znak před kurzor
+                            cursor.before(text[i]);
+                            i++;
+                            setTimeout(tick, speed);
+                        } else {
+                            resolve();
+                        }
+                    }
+                    tick();
+                });
+            }
+
+            function typeHTML(element, html, speed) {
+                return new Promise(resolve => {
+                    element.innerHTML = '';
+                    element.style.visibility = 'visible';
+                    element.appendChild(cursor);
+
+                    // Parsujeme HTML do fragmentu
+                    const template = document.createElement('template');
+                    template.innerHTML = html;
+                    const fragment = template.content;
+
+                    // Projdeme všechny textové uzly a elementy
+                    const parts = [];
+                    function walk(node) {
+                        for (const child of node.childNodes) {
+                            if (child.nodeType === Node.TEXT_NODE) {
+                                for (const ch of child.textContent) {
+                                    parts.push({ type: 'char', value: ch });
+                                }
+                            } else if (child.nodeType === Node.ELEMENT_NODE) {
+                                parts.push({ type: 'open', tag: child.tagName.toLowerCase(), node: child.cloneNode(false) });
+                                walk(child);
+                                parts.push({ type: 'close' });
+                            }
+                        }
+                    }
+                    walk(fragment);
+
+                    // Vypisujeme postupně
+                    let i = 0;
+                    let currentParent = element;
+                    const parentStack = [element];
+
+                    function tick() {
+                        if (i < parts.length) {
+                            const part = parts[i];
+                            if (part.type === 'char') {
+                                currentParent.insertBefore(document.createTextNode(part.value), cursor.parentNode === currentParent ? cursor : null);
+                            } else if (part.type === 'open') {
+                                const el = part.node;
+                                currentParent.insertBefore(el, cursor.parentNode === currentParent ? cursor : null);
+                                el.appendChild(cursor);
+                                parentStack.push(el);
+                                currentParent = el;
+                                i++;
+                                tick();
+                                return;
+                            } else if (part.type === 'close') {
+                                parentStack.pop();
+                                currentParent = parentStack[parentStack.length - 1];
+                                currentParent.insertBefore(cursor, null);
+                                i++;
+                                tick();
+                                return;
+                            }
+                            i++;
+                            setTimeout(tick, speed);
+                        } else {
+                            resolve();
+                        }
+                    }
+                    tick();
+                });
+            }
+
+            async function startTyping() {
+                await typeText(label, labelText, 35);
+                await new Promise(r => setTimeout(r, 200));
+                await typeHTML(h1, h1HTML, 25);
+                await new Promise(r => setTimeout(r, 150));
+                await typeText(p, pText, 12);
+                // Odstraníme kurzor a zobrazíme CTA
+                cursor.remove();
+                cta.classList.add('visible');
+            }
+
+            startTyping();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O mně — Marek Tatýrek</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #FAFAF8;
+            --color-surface: #FFFFFF;
+            --color-text: #1A1A1A;
+            --color-text-secondary: #6B6B6B;
+            --color-accent: #2D5A27;
+            --color-accent-light: #E8F0E6;
+            --color-border: #E8E6E1;
+            --color-border-light: #F0EEEA;
+            --font-display: 'DM Serif Display', Georgia, serif;
+            --font-body: 'DM Sans', -apple-system, sans-serif;
+            --max-width: 960px;
+            --spacing-section: clamp(80px, 12vw, 140px);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.7;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navigace */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 0 24px;
+            background: rgba(250, 250, 248, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border-light);
+        }
+
+        .nav-inner {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-logo {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            color: var(--color-text);
+            text-decoration: none;
+            letter-spacing: -0.01em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            transition: color 0.2s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1.5px;
+            background: var(--color-accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--color-text);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Obsah */
+        .about-page {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: calc(64px + var(--spacing-section)) 24px var(--spacing-section);
+        }
+
+        .about-page .section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin-bottom: 16px;
+        }
+
+        .about-page h1 {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            margin-bottom: 40px;
+            line-height: 1.2;
+        }
+
+        .about-page p {
+            color: var(--color-text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.85;
+            margin-bottom: 24px;
+        }
+
+        .about-page p:first-of-type {
+            color: var(--color-text);
+            font-size: 1.1rem;
+        }
+
+        .about-page a {
+            color: var(--color-accent);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        .about-page a:hover {
+            border-bottom-color: var(--color-accent);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 48px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--color-accent);
+            text-decoration: none;
+            transition: gap 0.2s ease;
+        }
+
+        .back-link:hover {
+            gap: 12px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--color-text-secondary);
+            font-size: 0.825rem;
+        }
+
+        /* Animace */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .about-page {
+            animation: fadeUp 0.6s ease both;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo">Marek Tatýrek</a>
+            <ul class="nav-links">
+                <li><a href="index.html#about">O mně</a></li>
+                <li><a href="index.html#projects">Projekty</a></li>
+                <li><a href="index.html#experience">Zkušenosti</a></li>
+                <li><a href="index.html#contact">Kontakt</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="about-page">
+        <span class="section-label">O mně</span>
+        <h1>Pár slov o mně</h1>
+
+        <img src="zaba.jpeg" alt="Marek Tatýrek" style="float: right; width: 200px; border-radius: 8px; margin: 0 0 24px 24px;">
+
+        <p>
+            Jmenuji se Marek Tatýrek, je mi 24 let a elektronikou a programováním se zabývam už od základní školy.
+        </p>
+
+        <p>
+            Studoval jsem
+            Střední průmyslovou školu ve Zlíně, obor Elektrotechnika se zaměřením na automatizaci a zabezpečovací systémy. Pokračoval jsem studiem
+            na bakalářského programu Automatizace a měření na VUT v Brně a momentálně studuji poslední ročník magisterského studia oboru Kybernetika.
+            Zároveň jsem v prvním ročníku magisterského kombinovaného studia oboru Strategický rozvoj podniku.
+          
+        </p>
+
+        <p>
+            I když mi během studia přišla většina předmětů a zaměření zajímavá, nejvíce jsem si oblíbil embedded programování a elektroniku.
+            Vždy mě nejvíc bavilo když jsem mohl nabyté znalosti uplatnit v praxi, proto jsem si už od střední začal navrhovat první obvody a
+            psát své první programy. V té době většinou na platformě Arduino. I když ne vše skončilo jednoznačným úspěchem, tak můžu říct,
+            že jsem se jednoznačně něco naučil.
+        </p>
+
+        <p>
+            Důležitý okamžik pro mě byl, když jsem si koupil osciloskop, který mi hlouběji pomohl porozumět, v té době
+            zejména analogové elektronice, protože jsem se začal zajímat o audiotechniku a zejména vintage receivery, které jsem začal servisovat a opravovat. Tou dobou jsem si začal zařizovat dílnu, což mi také zabralo nezanedbatelné množství času a můžete ji vidět na obrázku.
+        </p>
+
+        <img src="dilna.jpg" alt="Moje dílna" style="width: 100%; border-radius: 8px; margin: 16px 0 32px;">
+
+        <p>
+            Během střední školy jsem si přivydělával na stavbě a uklízením, po střední jsem pak pracoval ve firmě Saturn, která se
+            věnuje decentralizovaným čističkám odpadních vod a taky internetovým sítím. Také jsem měl
+            možnost absolvovat 3 týdenní pracovní stáž v Budapešti ve firmě Power Quattro.
+        </p>
+        <p>
+            S nástupem na vysokou školu jsem svůj zájem směřoval opět k digitálním obvodům a objevil mikročipy ESP32, které
+            oproti čipům Atmega v Arduinu nabízely mnohem více možností a já pomocí nich realizoval většinu svých projektů.
+        </p>
+
+        <p>
+            Mimo školu a elektroniku která je mi i koníčkem, rád hraju na hudební nástroje zejména pak klavír, hře na
+            nějž se věnuji od základní školy. Užívám si také cestování — zajímá mě spíš autentická atmosféra málo známých míst než prohlídkové okruhy, ale ze všeho nejraději sdílím tyto chvíle s přáteli. Rád chodím pěšky nebo stopuji.
+        </p>
+
+    
+        <p>
+            Dále trávím čas čtením, akvaristikou nebo mě baví i fyzická práce, ze sportů pak lyže, kolo, posilovna a judo.
+        </p>
+
+        <p>
+            Pokud vás něco
+            zaujalo, neváhejte se <a href="index.html#contact">ozvat</a>.
+        </p>
+
+        <a href="index.html" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 7L7 17M7 17V7M7 17H17"/></svg>
+            Zpět na hlavní stránku
+        </a>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 Marek Tatýrek.</p>
+    </footer>
+
+</body>
+</html>
