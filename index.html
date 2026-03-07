@@ -361,46 +361,8 @@
             color: var(--color-text);
             text-align: center;
             transition: all 0.3s ease;
-            position: relative;
         }
 
-        .skill-name {
-            display: block;
-        }
-
-        .skill-desc {
-            position: absolute;
-            left: -1px;
-            right: -1px;
-            top: 100%;
-            background: var(--color-accent-light);
-            border: 1px solid var(--color-accent);
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            padding: 0 12px;
-            max-height: 0;
-            overflow: hidden;
-            opacity: 0;
-            font-size: 0.78rem;
-            font-weight: 400;
-            color: var(--color-text-secondary);
-            line-height: 1.5;
-            transition: max-height 0.3s ease, opacity 0.25s ease, padding 0.3s ease;
-            z-index: 10;
-        }
-
-        .skill-tag:hover {
-            border-color: var(--color-accent);
-            background: var(--color-accent-light);
-            border-radius: 8px 8px 0 0;
-            z-index: 11;
-        }
-
-        .skill-tag:hover .skill-desc {
-            max-height: 80px;
-            opacity: 1;
-            padding: 8px 12px;
-        }
 
         /* ============================================
            PROJEKTY — kartičky (cards)
@@ -1033,46 +995,16 @@
                 </div>
                 <div>
                     <div class="skills-grid">
-                        <div class="skill-tag">
-                            <span class="skill-name">C / C++</span>
-                            <span class="skill-desc" data-i18n="skill.c">Firmware pro STM32, ESP32 — práce s registry, HAL, RTOS.</span>
-                        </div>
-                        <div class="skill-tag">
-                            <span class="skill-name">IoT - Matter</span>
-                            <span class="skill-desc" data-i18n="skill.iot">Protokol Matter, Thread, integrace do chytré domácnosti.</span>
-                        </div>
-                        <div class="skill-tag">
-                            <span class="skill-name">Python</span>
-                            <span class="skill-desc" data-i18n="skill.python">Skripty, automatizace, zpracování dat, testování.</span>
-                        </div>
-                        <div class="skill-tag">
-                            <span class="skill-name">ESP32, STM32, nRF52</span>
-                            <span class="skill-desc" data-i18n="skill.esp">Vývoj na ARM Cortex-M a Xtensa platformách.</span>
-                        </div>
-                        <div class="skill-tag">
-                            <span class="skill-name">Matlab</span>
-                            <span class="skill-desc" data-i18n="skill.matlab">Simulace, modelování systémů, zpracování signálů.</span>
-                        </div>
-                        <div class="skill-tag">
-                            <span class="skill-name">PCB Design</span>
-                            <span class="skill-desc" data-i18n="skill.pcb">Návrh schémat a layoutu v KiCadu, osazování.</span>
-                        </div>
-                        <div class="skill-tag">
-                            <span class="skill-name">VHDL</span>
-                            <span class="skill-desc" data-i18n="skill.vhdl">Návrh digitálních obvodů pro FPGA.</span>
-                        </div>
-                        <div class="skill-tag">
-                            <span class="skill-name">3D modeling</span>
-                            <span class="skill-desc" data-i18n="skill.3d">Modelování krabic a dílů pro 3D tisk.</span>
-                        </div>
-                        <div class="skill-tag">
-                            <span class="skill-name">Git</span>
-                            <span class="skill-desc" data-i18n="skill.git">Verzování kódu, branching, code review.</span>
-                        </div>
-                        <div class="skill-tag">
-                            <span class="skill-name">Energy Harvesting</span>
-                            <span class="skill-desc" data-i18n="skill.eh">Napájení IoT zařízení z okolní energie.</span>
-                        </div>
+                        <div class="skill-tag"><span class="skill-name">C / C++</span></div>
+                        <div class="skill-tag"><span class="skill-name">IoT - Matter</span></div>
+                        <div class="skill-tag"><span class="skill-name">Python</span></div>
+                        <div class="skill-tag"><span class="skill-name">ESP32, STM32, nRF52</span></div>
+                        <div class="skill-tag"><span class="skill-name">Matlab</span></div>
+                        <div class="skill-tag"><span class="skill-name">PCB Design</span></div>
+                        <div class="skill-tag"><span class="skill-name">SPICE</span></div>
+                        <div class="skill-tag"><span class="skill-name">3D modeling</span></div>
+                        <div class="skill-tag"><span class="skill-name">Git</span></div>
+                        <div class="skill-tag"><span class="skill-name">Energy Harvesting</span></div>
                     </div>
                 </div>
                 <p class="about-full-width" data-i18n-html="about.p2">
@@ -1337,11 +1269,30 @@
             </div>
 
             <div class="timeline-item">
-                <div class="timeline-date" data-i18n="tl.4.date">2017 — 2021</div>
-                <h3 data-i18n="tl.4.h3">Opravy vintage audio receiverů</h3>
-                <p data-i18n="tl.4.p">
-                    Servis a opravy analogových audio receiverů během střední školy.
-                </p>
+                <div class="timeline-date" data-i18n="tl.4.date">2021</div>
+                <h3 data-i18n="tl.4.h3">Technik</h3>
+                <div class="company">Saturn</div>
+                <p data-i18n="tl.4.p">Decentralizované čističky odpadních vod a instalace internetových sítí.</p>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-date" data-i18n="tl.5.date">2019</div>
+                <h3 data-i18n="tl.5.h3">Pracovní stáž</h3>
+                <div class="company" data-i18n="tl.5.company">Power Quattro, Budapešť</div>
+                <p data-i18n="tl.5.p">3týdenní pobyt zaměřený na průmyslovou elektroniku.</p>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-date" data-i18n="tl.6.date">2018 — 2019</div>
+                <h3 data-i18n="tl.6.h3">Testování firmware</h3>
+                <div class="company">Neota CZ</div>
+                <p data-i18n="tl.6.p">Funkční testování FW tepelných čerpadel na reálném HW, automatizované testy.</p>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-date" data-i18n="tl.7.date">2017 — 2021</div>
+                <h3 data-i18n="tl.7.h3">Opravy vintage audio receiverů</h3>
+                <p data-i18n="tl.7.p">Servis a opravy analogových audio receiverů během střední školy.</p>
             </div>
 
         </div>
@@ -1391,10 +1342,6 @@
                 <div class="modal-gallery"></div>
                 <div class="modal-description"></div>
                 <div class="project-tags modal-tags"></div>
-                <a href="#" class="project-link modal-link" target="_blank">
-                    <span data-i18n="modal.github">Zobrazit na GitHubu</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-                </a>
             </div>
         </div>
     </div>
@@ -1437,7 +1384,7 @@
                     "skill.esp": "Development on ARM Cortex-M and Xtensa platforms.",
                     "skill.matlab": "Simulation, system modelling, signal processing.",
                     "skill.pcb": "Schematic and PCB layout in KiCad, assembly.",
-                    "skill.vhdl": "Digital circuit design for FPGAs.",
+                    "skill.vhdl": "Analog circuit simulation.",
                     "skill.3d": "Modelling enclosures and parts for 3D printing.",
                     "skill.git": "Version control, branching, code review.",
                     "skill.eh": "Powering IoT devices from ambient energy.",
@@ -1468,9 +1415,19 @@
                     "tl.3.date": "2021 \u2014 2024",
                     "tl.3.h3": "Bachelor\u2019s degree",
                     "tl.3.p": "Automation and Measurement Technology, FEEC.",
-                    "tl.4.date": "2017 \u2014 2021",
-                    "tl.4.h3": "Vintage audio receiver repairs",
-                    "tl.4.p": "Servicing and repairing analogue audio receivers during secondary school.",
+                    "tl.4.date": "2021",
+                    "tl.4.h3": "Technician",
+                    "tl.4.p": "Decentralized wastewater treatment plants and internet network installations.",
+                    "tl.5.date": "2019",
+                    "tl.5.h3": "Internship",
+                    "tl.5.company": "Power Quattro, Budapest",
+                    "tl.5.p": "3-week internship focused on industrial electronics.",
+                    "tl.6.date": "2018 \u2014 2019",
+                    "tl.6.h3": "Firmware testing",
+                    "tl.6.p": "Functional testing of heat pump firmware on real hardware, automated tests.",
+                    "tl.7.date": "2017 \u2014 2021",
+                    "tl.7.h3": "Vintage audio receiver repairs",
+                    "tl.7.p": "Servicing and repairing analogue audio receivers during secondary school.",
                     "contact.label": "Contact",
                     "contact.h2": "Get in touch",
                     "modal.github": "View on GitHub"
