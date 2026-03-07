@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV — Marek Tatýrek</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #FAFAF8;
+            --color-surface: #FFFFFF;
+            --color-text: #1A1A1A;
+            --color-text-secondary: #6B6B6B;
+            --color-accent: #2D5A27;
+            --color-accent-light: #E8F0E6;
+            --color-border: #E8E6E1;
+            --color-border-light: #F0EEEA;
+            --font-display: 'DM Serif Display', Georgia, serif;
+            --font-body: 'DM Sans', -apple-system, sans-serif;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ---- TOOLBAR (screen only) ---- */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 20px 24px 12px;
+        }
+
+        .toolbar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .toolbar a:hover {
+            color: var(--color-accent);
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-lang {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 14px;
+            background: transparent;
+            color: var(--color-text-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 7px;
+            font-family: var(--font-body);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-lang:hover {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+        }
+
+        .btn-print {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 18px;
+            background: var(--color-accent);
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-family: var(--font-body);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+        }
+
+        .btn-print:hover {
+            background: #234A1E;
+            transform: translateY(-1px);
+        }
+
+        /* ---- WRAPPER ---- */
+        .cv-wrapper {
+            max-width: 960px;
+            margin: 0 auto 48px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+        }
+
+        /* ---- HEADER ---- */
+        .cv-header {
+            padding: 48px 56px 36px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 40px;
+        }
+
+        .cv-header-left h1 {
+            font-family: var(--font-display);
+            font-size: 2.8rem;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 10px;
+        }
+
+        .cv-role {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+        }
+
+        .cv-summary {
+            margin-top: 16px;
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            line-height: 1.75;
+            max-width: 440px;
+        }
+
+        .cv-contact {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+            padding-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .cv-contact a {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-size: 0.82rem;
+            transition: color 0.2s;
+        }
+
+        .cv-contact a:hover {
+            color: var(--color-accent);
+        }
+
+        .cv-contact svg {
+            opacity: 0.6;
+            flex-shrink: 0;
+        }
+
+        .cv-photo {
+            width: 150px;
+            height: 188px;
+            border-radius: 10px;
+            object-fit: cover;
+            object-position: top center;
+            border: 1px solid var(--color-border);
+            flex-shrink: 0;
+            display: block;
+            align-self: flex-end;
+            margin-bottom: 4px;
+        }
+
+        .cv-contact {
+            flex-direction: row !important;
+            flex-wrap: wrap;
+            gap: 12px 20px !important;
+            align-items: center !important;
+            margin-top: 16px;
+        }
+
+        /* ---- BODY: two columns ---- */
+        .cv-body {
+            display: grid;
+            grid-template-columns: 210px 1fr;
+        }
+
+        /* ---- SIDEBAR ---- */
+        .cv-sidebar {
+            padding: 36px 24px 36px 28px;
+            border-right: 1px solid var(--color-border);
+            background: var(--color-bg);
+        }
+
+        .cv-main {
+            padding: 36px 48px 40px;
+        }
+
+        /* ---- SECTION ---- */
+        .cv-section {
+            margin-bottom: 32px;
+        }
+
+        .cv-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .cv-section-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        /* ---- SKILLS ---- */
+        .skill-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .skill-list li {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--color-text);
+            padding: 6px 10px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            line-height: 1.35;
+        }
+
+        .skill-list li span {
+            display: block;
+            font-weight: 400;
+            font-size: 0.74rem;
+            color: var(--color-text-secondary);
+            margin-top: 2px;
+        }
+
+        /* ---- LANGUAGES ---- */
+        .lang-item {
+            margin-bottom: 9px;
+        }
+
+        .lang-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .lang-name {
+            font-size: 0.83rem;
+            font-weight: 500;
+        }
+
+        .lang-level {
+            font-size: 0.76rem;
+            color: var(--color-text-secondary);
+        }
+
+        /* ---- INTERESTS ---- */
+        .interests-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .interests-wrap span {
+            font-size: 0.73rem;
+            padding: 3px 8px;
+            background: var(--color-accent-light);
+            color: var(--color-accent);
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        /* ---- TIMELINE ---- */
+        .timeline {
+            position: relative;
+            padding-left: 22px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 7px;
+            bottom: 7px;
+            width: 1px;
+            background: var(--color-border);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 26px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 7px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-accent);
+            border: 2px solid var(--color-surface);
+        }
+
+        .timeline-date {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--color-accent);
+            letter-spacing: 0.06em;
+            margin-bottom: 3px;
+        }
+
+        .timeline-item h3 {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.3;
+            margin-bottom: 2px;
+        }
+
+        .timeline-company {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .timeline-item p {
+            font-size: 0.83rem;
+            color: var(--color-text-secondary);
+            line-height: 1.65;
+        }
+
+        .timeline-badge {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 2px 7px;
+            background: var(--color-accent-light);
+            color: var(--color-accent);
+            border-radius: 4px;
+            margin-left: 6px;
+            vertical-align: middle;
+            letter-spacing: 0.04em;
+        }
+
+        /* ---- PROJECTS ---- */
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .project-item {
+            padding: 13px 16px 13px 19px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            position: relative;
+            transition: border-color 0.2s;
+        }
+
+        .project-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--color-accent);
+            border-radius: 8px 0 0 8px;
+        }
+
+        .project-item h4 {
+            font-family: var(--font-display);
+            font-size: 0.92rem;
+            font-weight: 400;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .project-item p {
+            font-size: 0.79rem;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+            margin-bottom: 7px;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .project-tags span {
+            font-size: 0.69rem;
+            padding: 2px 7px;
+            background: var(--color-bg);
+            border: 1px solid var(--color-border-light);
+            border-radius: 3px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        /* ---- PRINT ---- */
+        @media print {
+            @page {
+                size: A4;
+                margin: 14mm 14mm 14mm 14mm;
+            }
+
+            body {
+                background: white;
+            }
+
+            .toolbar {
+                display: none;
+            }
+
+            .cv-wrapper {
+                margin: 0;
+                max-width: 100%;
+                border: none;
+                border-radius: 0;
+                box-shadow: none;
+                zoom: 0.88;
+            }
+
+            .cv-header {
+                padding: 0 0 24px;
+            }
+
+            .cv-sidebar {
+                padding: 24px 20px 24px 0;
+            }
+
+            .cv-main {
+                padding: 24px 0 24px 36px;
+            }
+
+            .cv-section {
+                margin-bottom: 22px;
+            }
+
+            .timeline-item {
+                padding-bottom: 18px;
+            }
+
+            .project-list {
+                gap: 9px;
+            }
+
+            .cv-body {
+                grid-template-columns: 170px 1fr;
+            }
+
+            a {
+                color: inherit !important;
+                text-decoration: none !important;
+            }
+
+            .skill-list li {
+                background: #f5f5f3;
+                border-color: #e0ddd8;
+            }
+
+            .timeline::before,
+            .timeline-item::before {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .timeline-item::before {
+                border-color: white;
+            }
+        }
+
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 680px) {
+            .cv-header {
+                flex-direction: column;
+                padding: 32px 24px 28px;
+            }
+
+            .cv-contact {
+                align-items: flex-start;
+            }
+
+            .cv-body {
+                grid-template-columns: 1fr;
+            }
+
+            .cv-sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--color-border);
+                padding: 28px 24px;
+            }
+
+            .cv-main {
+                padding: 28px 24px;
+            }
+
+            .toolbar {
+                padding: 16px 16px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toolbar (screen only) -->
+    <div class="toolbar">
+        <a href="index.html">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M5 12L12 19M5 12L12 5"/></svg>
+            <span data-i18n="back_link">Zpět na web</span>
+        </a>
+        <div class="toolbar-right">
+            <button class="btn-lang" id="btn-lang" onclick="toggleLang()">EN</button>
+            <button class="btn-print" onclick="window.print()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                <span data-i18n="print_btn">Tisk / PDF</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="cv-wrapper">
+
+        <!-- HEADER -->
+        <header class="cv-header">
+            <div class="cv-header-left">
+                <h1>Marek Tatýrek</h1>
+                <div class="cv-role">Embedded Engineer</div>
+                <p class="cv-summary" data-i18n="summary">
+                    Baví mě průnik hardwaru a softwaru — od návrhu PCB a nízkoúrovňového firmware až po integraci
+                    do IoT ekosystémů. Věci si rád ověřuji v praxi. Studuji kybernetiku na VUT Brno.
+                </p>
+                <div class="cv-contact">
+                    <a href="mailto:matatyrek@gmail.com">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13L2 4"/></svg>
+                        matatyrek@gmail.com
+                    </a>
+                    <a href="https://marektatyrek.cz" target="_blank">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        marektatyrek.cz
+                    </a>
+                    <a href="https://github.com/vasucet" target="_blank">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                        GitHub
+                    </a>
+                    <a href="https://linkedin.com/in/vasucet" target="_blank">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        LinkedIn
+                    </a>
+                </div>
+            </div>
+            <img src="me.jpg" alt="Marek Tatýrek" class="cv-photo">
+        </header>
+
+        <!-- BODY -->
+        <div class="cv-body">
+
+            <!-- SIDEBAR -->
+            <aside class="cv-sidebar">
+
+                <div class="cv-section">
+                    <div class="cv-section-label" data-i18n="skills_label">Dovednosti</div>
+                    <ul class="skill-list">
+                        <li>C / C++</li>
+                        <li>ESP32 · STM32 · nRF52</li>
+                        <li>IoT / Matter</li>
+                        <li>PCB Design</li>
+                        <li>Python</li>
+                        <li>Matlab</li>
+                        <li>Energy Harvesting</li>
+                        <li data-i18n="skill_3d">3D modelování</li>
+                        <li>Git</li>
+                    </ul>
+                </div>
+
+                <div class="cv-section">
+                    <div class="cv-section-label" data-i18n="lang_label">Jazyky</div>
+                    <div class="lang-item">
+                        <div class="lang-name" data-i18n="lang_cs">Čeština</div>
+                        <div class="lang-level" data-i18n="lang_cs_level">Rodilý mluvčí</div>
+                    </div>
+                    <div class="lang-item">
+                        <div class="lang-name" data-i18n="lang_en">Angličtina</div>
+                        <div class="lang-level">B2-C1</div>
+                    </div>
+                    <div class="lang-item">
+                        <div class="lang-name" data-i18n="lang_it">Italština</div>
+                        <div class="lang-level">A1</div>
+                    </div>
+                </div>
+
+                <div class="cv-section">
+                    <div class="cv-section-label" data-i18n="cert_label">Certifikáty</div>
+                    <div class="lang-item">
+                        <div class="lang-name">Cisco CCNA</div>
+                        <div class="lang-level">Cisco Networking Academy</div>
+                        <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="d231464d-ceb3-4cc0-aa46-0ec5a927ecf2" data-share-badge-host="https://www.credly.com" style="margin-top: 8px;"></div>
+                        <script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script>
+                    </div>
+                    <div class="lang-item">
+                        <div class="lang-name" data-i18n="cert_elec">Elektrotechnická kvalifikace</div>
+                        <div class="lang-level" data-i18n="cert_elec_detail">Pracovník znalý §6 — NV č. 194/2022 Sb.</div>
+                    </div>
+                </div>
+
+                <div class="cv-section">
+                    <div class="cv-section-label" data-i18n="interests_label">Zájmy</div>
+                    <div class="interests-wrap">
+                        <span data-i18n="int_piano">Klavír</span>
+                        <span data-i18n="int_reading">Četba</span>
+                        <span>Judo</span>
+                        <span data-i18n="int_aqua">Akvaristika</span>
+                        <span data-i18n="int_travel">Cestování</span>
+                        <span data-i18n="int_ski">Lyže</span>
+                        <span data-i18n="int_bike">Kolo</span>
+
+                        
+                    </div>
+                </div>
+
+            </aside>
+
+            <!-- MAIN -->
+            <main class="cv-main">
+
+                <!-- ABOUT -->
+                <div class="cv-section">
+                    <div class="cv-section-label" data-i18n="about_label">O mně</div>
+                    <p style="font-size: 0.88rem; color: var(--color-text-secondary); line-height: 1.8;" data-i18n="about_p1">
+                        Baví mě věci, které mají fyzický výstup. Pohybuji se na pomezí hardwaru a softwaru — navrhuji DPS,
+                        píšu firmware a rád dotahuji projekty do konce. Studuji kybernetiku na VUT Brno a souběžně management,
+                        protože mě zajímá i druhá strana technických projektů.
+                    </p>
+                    <p style="font-size: 0.88rem; color: var(--color-text-secondary); line-height: 1.8; margin-top: 10px;" data-i18n="about_p2">
+                        Zájem o elektroniku a programování mě provází od konce základní školy až do teď, kdy píšu diplomovou práci na
+                        téma využití energy harvestingu v chytré domácnosti. Kromě této práce, která je zároveň i mým osobním projektem, jsem
+                        si například od nuly postavil zesilovač. Víc se o mě i mých projektech dočtete na mé webové stránce.
+                    </p>
+                </div>
+
+                <!-- EDUCATION -->
+                <div class="cv-section">
+                    <div class="cv-section-label" data-i18n="edu_label">Vzdělání</div>
+                    <div class="timeline">
+
+                        <div class="timeline-item">
+                            <div class="timeline-date" data-i18n="edu1_date">2024 — současnost</div>
+                            <h3 data-i18n="edu1_title">Ing. — Kybernetika, automatizace a měření</h3>
+                            <div class="timeline-company">VUT Brno, FEKT &amp; FP</div>
+                            <p data-i18n="edu1_detail">Souběžně kombinované studium Management a ekonomie.</p>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-date">2025</div>
+                            <h3>Erasmus</h3>
+                            <div class="timeline-company" data-i18n="edu2_company">Università degli Studi di Padova, Itálie</div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-date">2021 — 2024</div>
+                            <h3 data-i18n="edu3_title">Bc. — Automatizace a měřicí technika</h3>
+                            <div class="timeline-company">VUT Brno, FEKT</div>
+                            <p data-i18n="edu3_detail">Bakalářská práce: Řídící systém akvárií s protokolem Matter na ESP32.</p>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-date">2017 — 2021</div>
+                            <h3 data-i18n="edu4_title">Elektrotechnika — automatizace a zabezpečovací systémy</h3>
+                            <div class="timeline-company" data-i18n="edu4_company">Střední průmyslová škola, Zlín</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- EXPERIENCE -->
+                <div class="cv-section">
+                    <div class="cv-section-label" data-i18n="exp_label">Zkušenosti</div>
+                    <div class="timeline">
+
+                        <div class="timeline-item">
+                            <div class="timeline-date">2021</div>
+                            <h3 data-i18n="exp1_title">Technik</h3>
+                            <div class="timeline-company">Saturn</div>
+                            <p data-i18n="exp1_detail">Decentralizované čističky odpadních vod a instalace internetových sítí.</p>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-date">2019</div>
+                            <h3 data-i18n="exp2_title">Pracovní stáž</h3>
+                            <div class="timeline-company" data-i18n="exp2_company">Power Quattro, Budapešť</div>
+                            <p data-i18n="exp2_detail">3týdenní pobyt zaměřený na průmyslovou elektroniku.</p>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-date">2017 — 2021</div>
+                            <h3 data-i18n="exp3_title">Servis vintage audio přijímačů</h3>
+                            <p data-i18n="exp3_detail">Opravy a seřizování analogové audio techniky — tranzistorové přijímače a zesilovače.</p>
+                        </div>
+
+                    </div>
+                </div>
+
+            </main>
+
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            cs: {
+                back_link:       'Zpět na web',
+                print_btn:       'Tisk / PDF',
+                summary:         'Baví mě průnik hardwaru a softwaru — od návrhu PCB a nízkoúrovňového firmware až po integraci do IoT ekosystémů. Věci si rád ověřuji v praxi. Studuji kybernetiku na VUT Brno.',
+                skills_label:    'Dovednosti',
+                skill_3d:        '3D modelování',
+                lang_label:      'Jazyky',
+                lang_cs:         'Čeština',
+                lang_cs_level:   'Rodilý mluvčí',
+                lang_en:         'Angličtina',
+                lang_it:         'Italština',
+                cert_label:      'Certifikáty',
+                cert_elec:       'Elektrotechnická kvalifikace',
+                cert_elec_detail:'Pracovník znalý §6 — NV č. 194/2022 Sb.',
+                interests_label: 'Zájmy',
+                int_piano:       'Klavír',
+                int_aqua:        'Akvaristika',
+                int_travel:      'Cestování',
+                int_ski:         'Lyže',
+                int_bike:        'Kolo',
+                int_reading:     'Četba',
+                about_label:     'O mně',
+                about_p1:        'Baví mě věci, které mají fyzický výstup. Pohybuji se na pomezí hardwaru a softwaru — navrhuji DPS, píšu firmware a rád dotahuji projekty do konce. Studuji kybernetiku na VUT Brno a souběžně management, protože mě zajímá i druhá strana technických projektů.',
+                about_p2:        'Zájem o elektroniku a programování mě provází od konce základní školy až do teď, kdy píšu diplomovou práci na téma využití energy harvestingu v chytré domácnosti. Kromě této práce, která je zároveň i mým osobním projektem, jsem si například od nuly postavil zesilovač. Víc se o mě i mých projektech dočtete na mé webové stránce.',
+                edu_label:       'Vzdělání',
+                edu1_date:       '2024 — současnost',
+                edu1_title:      'Ing. — Kybernetika, automatizace a měření',
+                edu1_detail:     'Souběžně kombinované studium Management a ekonomie.',
+                edu2_company:    'Università degli Studi di Padova, Itálie',
+                edu3_title:      'Bc. — Automatizace a měřicí technika',
+                edu3_detail:     'Bakalářská práce: Řídící systém akvárií s protokolem Matter na ESP32.',
+                edu4_title:      'Elektrotechnika — automatizace a zabezpečovací systémy',
+                edu4_company:    'Střední průmyslová škola, Zlín',
+                exp_label:       'Zkušenosti',
+                exp1_title:      'Technik',
+                exp1_detail:     'Decentralizované čističky odpadních vod a instalace internetových sítí.',
+                exp2_title:      'Pracovní stáž',
+                exp2_company:    'Power Quattro, Budapešť',
+                exp2_detail:     '3týdenní pobyt zaměřený na průmyslovou elektroniku.',
+                exp3_title:      'Servis vintage audio přijímačů',
+                exp3_detail:     'Opravy a seřizování analogové audio techniky — tranzistorové přijímače a zesilovače.',
+            },
+            en: {
+                back_link:       'Back to website',
+                print_btn:       'Print / PDF',
+                summary:         'I enjoy the intersection of hardware and software — from PCB design and low-level firmware to integration into IoT ecosystems. I like to verify things in practice. I study cybernetics at VUT Brno.',
+                skills_label:    'Skills',
+                skill_3d:        '3D Modelling',
+                lang_label:      'Languages',
+                lang_cs:         'Czech',
+                lang_cs_level:   'Native speaker',
+                lang_en:         'English',
+                lang_it:         'Italian',
+                cert_label:      'Certificates',
+                cert_elec:       'Electrical Engineering Qualification',
+                cert_elec_detail:'Qualified worker §6 — Czech Govt. Regulation No. 194/2022',
+                interests_label: 'Interests',
+                int_piano:       'Piano',
+                int_aqua:        'Aquaristics',
+                int_travel:      'Travelling',
+                int_ski:         'Skiing',
+                int_bike:        'Cycling',
+                int_reading:     'Reading',
+                about_label:     'About me',
+                about_p1:        'I enjoy things with a physical output. I work at the intersection of hardware and software — designing PCBs, writing firmware, and seeing projects through to completion. I study cybernetics at VUT Brno alongside management, because I am also interested in the business side of technical projects.',
+                about_p2:        'My interest in electronics and programming has been with me since the end of primary school, and continues today as I write my master\'s thesis on the use of energy harvesting in a smart home. Besides this project, which is also a personal one of mine, I built an amplifier from scratch. You can read more about me and my projects on my website.',
+                edu_label:       'Education',
+                edu1_date:       '2024 — present',
+                edu1_title:      'M.Sc. — Cybernetics, Automation and Measurement',
+                edu1_detail:     'Simultaneously enrolled in a combined Management and Economics programme.',
+                edu2_company:    'Università degli Studi di Padova, Italy',
+                edu3_title:      'B.Sc. — Automation and Measurement Technology',
+                edu3_detail:     'Bachelor\'s thesis: Aquarium Control System with Matter Protocol on ESP32.',
+                edu4_title:      'Electrical Engineering — Automation and Security Systems',
+                edu4_company:    'Industrial Secondary School, Zlín',
+                exp_label:       'Experience',
+                exp1_title:      'Technician',
+                exp1_detail:     'Decentralized wastewater treatment plants and internet network installations.',
+                exp2_title:      'Internship',
+                exp2_company:    'Power Quattro, Budapest',
+                exp2_detail:     '3-week internship focused on industrial electronics.',
+                exp3_title:      'Vintage Audio Receiver Servicing',
+                exp3_detail:     'Repair and calibration of analog audio equipment — transistor receivers and amplifiers.',
+            }
+        };
+
+        let currentLang = 'cs';
+
+        function setLang(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            document.getElementById('btn-lang').textContent = lang === 'cs' ? 'EN' : 'CZ';
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key] !== undefined) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+        }
+
+        function toggleLang() {
+            setLang(currentLang === 'cs' ? 'en' : 'cs');
+        }
+    </script>
+
+</body>
+</html>
