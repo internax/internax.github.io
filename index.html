@@ -1569,8 +1569,6 @@
         const modalGallery = modal.querySelector('.modal-gallery');
         const modalDesc = modal.querySelector('.modal-description');
         const modalTags = modal.querySelector('.modal-tags');
-        const modalLink = modal.querySelector('.modal-link');
-
         function openModal(card) {
             const lang = window._lang || 'cs';
             modalTitle.textContent = (lang === 'en' && card.dataset.titleEn) ? card.dataset.titleEn : card.dataset.title;
@@ -1594,14 +1592,6 @@
                 modalTags.appendChild(span);
             });
 
-            // Odkaz na GitHub
-            const link = card.dataset.link;
-            if (link && link !== '#') {
-                modalLink.href = link;
-                modalLink.style.display = 'inline-flex';
-            } else {
-                modalLink.style.display = 'none';
-            }
 
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
