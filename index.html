@@ -1652,24 +1652,35 @@
             let mouseStrength = 0;     // 0 = žádný efekt, 1 = plný efekt
             let targetStrength = 0;
             let nodes = [];
-            const NODE_COUNT = 90;
-            const CONNECT_DIST = 150;
+
+            const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
+            const NODE_COUNT = isMobile ? 40 : 90;
+            const CONNECT_DIST = isMobile ? 110 : 150;
             const MOUSE_RADIUS = 200;
 
             // Tagy které považujeme za "prázdné pozadí"
             const bgTags = new Set(['SECTION', 'BODY', 'HTML', 'CANVAS', 'HR']);
 
+            let dpr = 1;
+
             function resize() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+                dpr = window.devicePixelRatio || 1;
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                canvas.width = w * dpr;
+                canvas.height = h * dpr;
+                canvas.style.width = w + 'px';
+                canvas.style.height = h + 'px';
             }
 
             function initNodes() {
                 nodes = [];
+                const W = canvas.width / dpr;
+                const H = canvas.height / dpr;
                 for (let i = 0; i < NODE_COUNT; i++) {
                     nodes.push({
-                        x: Math.random() * canvas.width,
-                        y: Math.random() * canvas.height,
+                        x: Math.random() * W,
+                        y: Math.random() * H,
                         vx: (Math.random() - 0.5) * 0.3,
                         vy: (Math.random() - 0.5) * 0.3,
                         r: Math.random() * 2 + 1.5
@@ -1684,7 +1695,9 @@
             }
 
             function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.save();
+                ctx.scale(dpr, dpr);
+                ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
 
                 // Plynulá interpolace síly efektu
                 mouseStrength += (targetStrength - mouseStrength) * 0.06;
@@ -1747,10 +1760,13 @@
                     // Pohyb uzlů (pomalý drift)
                     node.x += node.vx;
                     node.y += node.vy;
-                    if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
-                    if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
+                    const W = canvas.width / dpr;
+                    const H = canvas.height / dpr;
+                    if (node.x < 0 || node.x > W) node.vx *= -1;
+                    if (node.y < 0 || node.y > H) node.vy *= -1;
                 }
 
+                ctx.restore();
                 requestAnimationFrame(draw);
             }
 
