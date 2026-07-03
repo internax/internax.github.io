@@ -987,7 +987,7 @@
             <div class="about-grid">
                 <div class="about-text">
                     <p data-i18n-html="about.p">
-                        Jsem student 2. ročníku magisterského studia oboru <a href="https://www.vut.cz/studenti/programy/program/9479" target="_blank">kybernetka, automatizace a měření</a>.
+                        Vystudoval jsem obor <a href="https://www.vut.cz/studenti/programy/program/9479" target="_blank">kybernetika, automatizace a měření</a>, magisterské studium jsem dokončil v roce 2026.
                         Zajímá mě propojení mezi hardwarem a softwarem, proto se zabývám zejména PCB designem a embedded programováním.
                         Věci si rád ověřuji praxí, proto jsem si postavil malou laboratoř a své studium doplňoval projekty, na kterých jsem se toho spoustu naučil.
                         Vedle toho studuji <a href="https://www.vut.cz/studenti/programy/program/9373" target="_blank">management a ekonomii</a>.
@@ -1010,7 +1010,7 @@
                 <p class="about-full-width" data-i18n-html="about.p2">
                     Mám zkušenost od návrhu schémat a layoutu desky, přes nízkoúrovňové programování na úrovni registrů, komunikační protokoly až po RTOS.
                     Mé pozornosti se zvlášť těší IoT a chytrá domácnost, kterými jsem se zabýval v podobě protokolu Matter jak ve své <a href="https://dspace.vut.cz/items/0862d79d-6370-4411-a905-91d1db68de6f" target="_blank">bakalářské</a>,
-                    tak i diplomové práci.
+                    tak i <a href="https://www.vut.cz/studenti/zav-prace/detail/176251?zp_id=176251" target="_blank">diplomové práci</a>.
                     Myslím si, že nejlepší ukázkou toho co umím jsou některé z <a href="#projects">mých projektů</a>.
                 </p>
             </div>
@@ -1109,25 +1109,26 @@
 
             <div class="project-card reveal"
                  data-title="Energy harvesting vypínač"
-                 data-description="&lt;p&gt;Jelikož mě v poslední době čím dál více zajímá IoT a to, jak tyto technologie dostat tam, kde s nimi nebylo původně počítáno, přijde
-                 mi využití energy harvestingu velmi zajímavé. Cílem práce je navrhnout energy harvester, který má jako zdroj energie kinetický harvester.
-                 Z této energie pak vyslat signál nadřazenému systému, který budu také implementovat a který se bude chovat jako Matter bridge a přenese informaci o změně stavu komponenty
-                 do ekosystému chytré domácnosti. Párování bude probíhat pomocí NFC.&lt;/p&gt;
-                 
-                 &lt;p&gt;Jedná se o práci, na které teď dělám. Aktuálně jsem ve stavu, že mám hotový energy harvester, který pomocí BT komunikuje prozatím s počítačem.
-                 Harvester je postaven na čipu nRF52832, který je známý svou nízkou spotřebou. Zajímavou věcí, kterou jsem v tomto projektu řešil, bylo třeba to, že i když
-                 má SDK od nRF velmi dobře napsaný BT stack, jeho inicializace je v měřítku získané energie velmi drahá, proto jsem si musel napsat vlastní jednoduchý ovladač
-                 pro vysílání přes BT. Nyní pracuji na Matter bridge části.&lt;/p&gt;
+                 data-description="&lt;p&gt;Jelikož mě v poslední době čím dál více zajímá IoT a to, jak tyto technologie dostat tam, kde s nimi nebylo původně počítáno, přišlo
+                 mi využití energy harvestingu velmi zajímavé. Cílem práce bylo navrhnout energy harvester, který má jako zdroj energie kinetický harvester.
+                 Z této energie se vysílá signál nadřazenému systému, který se chová jako Matter bridge a přenáší informaci o změně stavu komponenty
+                 do ekosystému chytré domácnosti. Párování probíhá pomocí NFC.&lt;/p&gt;
+
+                 &lt;p&gt;Harvester je postaven na čipu nRF52832, který je známý svou nízkou spotřebou. Zajímavou věcí, kterou jsem v tomto projektu řešil, bylo třeba to, že i když
+                 má SDK od nRF velmi dobře napsaný BT stack, jeho inicializace je v měřítku získané energie velmi drahá, proto jsem si napsal vlastní jednoduchý ovladač
+                 pro vysílání přes BT.&lt;/p&gt;
+
+                 &lt;p&gt;Práce byla oceněna cenou děkana FEKT. Kompletní text diplomové práce je dostupný &lt;a href=&quot;https://www.vut.cz/studenti/zav-prace/detail/176251?zp_id=176251&quot; target=&quot;_blank&quot;&gt;zde&lt;/a&gt;.&lt;/p&gt;
                 "
                  data-images='["harvester.jpg"]'
                  data-tags="Matter,NFC,nRF52,ESP32"
-                 data-link="#"
+                 data-link="https://www.vut.cz/studenti/zav-prace/detail/176251?zp_id=176251"
                  data-title-en="Energy Harvesting Switch"
-                 data-description-en="&lt;p&gt;With a growing interest in IoT and bringing these technologies to places they weren't originally designed for, energy harvesting has become very appealing. The goal is to design an energy harvester powered by a kinetic harvester, use that energy to send a signal to a central system (acting as a Matter bridge) that relays switch state changes into the smart home ecosystem. Pairing will be done via NFC.&lt;/p&gt;&lt;p&gt;This is an ongoing project. Currently I have a working harvester that communicates via BT with a computer. It is built around the nRF52832, known for ultra-low power consumption. An interesting challenge: even though the nRF SDK has a well-written BT stack, its initialisation is too expensive in terms of harvested energy, so I wrote my own minimal BT transmission driver. I am now working on the Matter bridge part.&lt;/p&gt;">
+                 data-description-en="&lt;p&gt;With a growing interest in IoT and bringing these technologies to places they weren't originally designed for, energy harvesting became very appealing. The goal was to design an energy harvester powered by a kinetic harvester, using that energy to send a signal to a central system acting as a Matter bridge that relays switch state changes into the smart home ecosystem. Pairing is done via NFC.&lt;/p&gt;&lt;p&gt;The device is built around the nRF52832, known for ultra-low power consumption. An interesting challenge: even though the nRF SDK has a well-written BT stack, its initialisation is too expensive in terms of harvested energy, so I wrote my own minimal BT transmission driver.&lt;/p&gt;&lt;p&gt;The thesis was awarded the &lt;strong&gt;FEEC Dean's Award&lt;/strong&gt;. The full thesis text is available &lt;a href=&quot;https://www.vut.cz/studenti/zav-prace/detail/176251?zp_id=176251&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;">
                 <div class="project-icon">🔋</div>
                 <h3 data-i18n="proj.harvester.h3">Energy harvesting vypínač</h3>
-                <p data-i18n="proj.harvester.p">Touto prací jsem se pustil do neprobádaných vod ultra low power a NFC. Vypracování
-                    je zároveň tématem mé diplomové práce.
+                <p data-i18n="proj.harvester.p">Touto prací jsem se pustil do neprobádaných vod ultra low power a NFC. Vypracování bylo tématem mé
+                    diplomové práce, oceněné cenou děkana FEKT.
                 </p>
                 <div class="project-tags">
                     <span>Matter</span>
@@ -1242,11 +1243,20 @@
         <div class="timeline reveal">
 
             <div class="timeline-item">
-                <div class="timeline-date" data-i18n="tl.1.date">2024 — současnost</div>
+                <div class="timeline-date" data-i18n="tl.1b.date">2024 — současnost</div>
+                <h3 data-i18n="tl.1b.h3">Magisterské studium</h3>
+                <div class="company">VUT Brno, FP</div>
+                <p data-i18n="tl.1b.p">
+                    Management a ekonomie, kombinované studium.
+                </p>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-date" data-i18n="tl.1.date">2024 — 2026</div>
                 <h3 data-i18n="tl.1.h3">Magisterské studium</h3>
-                <div class="company">VUT Brno</div>
+                <div class="company">VUT Brno, FEKT</div>
                 <p data-i18n="tl.1.p">
-                    Kybernetika, automatizace a měření (FEKT) a Management a ekonomie (FP).
+                    Absolvent oboru Kybernetika, automatizace a měření.
                 </p>
             </div>
 
@@ -1377,7 +1387,7 @@
                     "hero.cta.about": "More about me",
                     "hero.cta.cv": "CV",
                     "about.label": "About",
-                    "about.p": "I\u2019m a 2nd-year master\u2019s student in <a href=\"https://www.vut.cz/studenti/programy/program/9479\" target=\"_blank\">cybernetics, automation and measurement</a>. I\u2019m interested in the intersection of hardware and software, focusing on PCB design and embedded programming. I like to verify things in practice, so I built a small lab and complemented my studies with hands-on projects. Alongside that, I also study <a href=\"https://www.vut.cz/studenti/programy/program/9373\" target=\"_blank\">management and economics</a>.",
+                    "about.p": "I studied <a href=\"https://www.vut.cz/studenti/programy/program/9479\" target=\"_blank\">cybernetics, automation and measurement</a>, completing my master\u2019s programme in 2026. I\u2019m interested in the intersection of hardware and software, focusing on PCB design and embedded programming. I like to verify things in practice, so I built a small lab and complemented my studies with hands-on projects. Alongside that, I also study <a href=\"https://www.vut.cz/studenti/programy/program/9373\" target=\"_blank\">management and economics</a>.",
                     "skill.c": "Firmware for STM32, ESP32 \u2014 registers, HAL, RTOS.",
                     "skill.iot": "Matter protocol, Thread, smart home integration.",
                     "skill.python": "Scripts, automation, data processing, testing.",
@@ -1388,7 +1398,7 @@
                     "skill.3d": "Modelling enclosures and parts for 3D printing.",
                     "skill.git": "Version control, branching, code review.",
                     "skill.eh": "Powering IoT devices from ambient energy.",
-                    "about.p2": "My experience spans from schematic and PCB layout design to low-level register programming, communication protocols, and RTOS. I have a particular interest in IoT and smart home, which I explored through the Matter protocol in both my <a href=\"https://dspace.vut.cz/items/0862d79d-6370-4411-a905-91d1db68de6f\" target=\"_blank\">bachelor\u2019s</a> and master\u2019s theses. Rather than listing skills, I let my <a href=\"#projects\">projects</a> speak.",
+                    "about.p2": "My experience spans from schematic and PCB layout design to low-level register programming, communication protocols, and RTOS. I have a particular interest in IoT and smart home, which I explored through the Matter protocol in both my <a href=\"https://dspace.vut.cz/items/0862d79d-6370-4411-a905-91d1db68de6f\" target=\"_blank\">bachelor\u2019s</a> and <a href=\"https://www.vut.cz/studenti/zav-prace/detail/176251?zp_id=176251\" target=\"_blank\">master\u2019s</a> theses. Rather than listing skills, I let my <a href=\"#projects\">projects</a> speak.",
                     "projects.label": "Projects",
                     "projects.h2": "What I work on",
                     "projects.desc": "A selection of my most interesting projects.",
@@ -1397,7 +1407,7 @@
                     "proj.amplifier.h3": "Amplifier",
                     "proj.amplifier.p": "With this project I fulfilled a dream from secondary school. I built a class AB amplifier with a DSP from scratch \u2014 the project I\u2019ve invested the most time in.",
                     "proj.harvester.h3": "Energy Harvesting Switch",
-                    "proj.harvester.p": "With this project I ventured into ultra-low power design and NFC. It is also the topic of my master\u2019s thesis.",
+                    "proj.harvester.p": "With this project I ventured into ultra-low power design and NFC. It is also my master\u2019s thesis, awarded the FEEC Dean\u2019s Award.",
                     "proj.lamp.h3": "Monitor Backlight Lamp",
                     "proj.lamp.p": "A simple project that solved my uneven desk lighting. Adjustable colour temperature and brightness, with smart home integration.",
                     "proj.desk.h3": "Height-Adjustable Desk",
@@ -1406,9 +1416,12 @@
                     "proj.speakers.p": "One of my first projects \u2014 building speakers and a subwoofer unit that I still use today.",
                     "exp.label": "Experience",
                     "exp.h2": "Studies & experience",
-                    "tl.1.date": "2024 \u2014 present",
+                    "tl.1.date": "2024 \u2014 2026",
                     "tl.1.h3": "Master\u2019s degree",
-                    "tl.1.p": "Cybernetics, Automation and Measurement (FEEC) and Management and Economics (FBE).",
+                    "tl.1.p": "Graduate in Cybernetics, Automation and Measurement (FEEC).",
+                    "tl.1b.date": "2024 \u2014 present",
+                    "tl.1b.h3": "Master\u2019s degree",
+                    "tl.1b.p": "Management and Economics (FBE), combined (part-time) programme.",
                     "tl.2.date": "2025",
                     "tl.2.h3": "Erasmus",
                     "tl.2.p": "Semester study stay in Italy.",
