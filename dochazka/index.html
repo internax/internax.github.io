@@ -1,0 +1,679 @@
+<title>Docházka – přepočet hodin</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #f4f5f7; --card: #ffffff; --text: #1c1f26; --muted: #6b7280;
+    --border: #e3e5e9; --accent: #2f6feb; --accent-bg: #eaf1ff;
+    --ok: #1a8a4a; --warn: #b45309; --bad: #c02626;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --card: #1d2026; --text: #e8e9ec; --muted: #9298a3;
+      --border: #2d313a; --accent: #6ea3ff; --accent-bg: #202a3d;
+      --ok: #3fc17c; --warn: #e0a545; --bad: #ef5959;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 2rem 1rem 4rem; background: var(--bg); color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.45;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 .25rem; }
+  .sub { color: var(--muted); font-size: .9rem; margin-bottom: 1.5rem; }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 1.25rem; margin-bottom: 1.25rem;
+  }
+  .drop {
+    border: 2px dashed var(--border); border-radius: 12px; padding: 2.5rem 1rem;
+    text-align: center; cursor: pointer; color: var(--muted); transition: border-color .15s, background .15s;
+  }
+  .drop.drag { border-color: var(--accent); background: var(--accent-bg); }
+  .drop strong { color: var(--text); }
+  input[type=file] { display: none; }
+  label.field { display: block; font-size: .85rem; color: var(--muted); margin-bottom: .3rem; }
+  select, input[type=number] {
+    width: 100%; padding: .55rem .6rem; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); font-size: 1rem;
+  }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 560px) { .row2 { grid-template-columns: 1fr; } }
+  .field-block { margin-bottom: 1rem; }
+  .field-block:last-child { margin-bottom: 0; }
+  .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; }
+  @media (max-width: 560px) { .stats { grid-template-columns: 1fr 1fr; } }
+  .stat { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: .8rem .9rem; }
+  .stat .label { font-size: .78rem; color: var(--muted); margin-bottom: .2rem; }
+  .stat .value { font-size: 1.3rem; font-weight: 650; }
+  .stat .value.ok { color: var(--ok); }
+  .stat .value.bad { color: var(--bad); }
+  .progress { height: 10px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border); overflow: hidden; margin-top: 1rem; }
+  .progress > div { height: 100%; background: var(--accent); }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  th, td { text-align: left; padding: .4rem .5rem; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .02em; }
+  tr.today td { background: var(--accent-bg); }
+  .tag { display: inline-block; padding: .1rem .5rem; border-radius: 999px; font-size: .74rem; font-weight: 600; }
+  .tag.ok { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .tag.open { background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn); }
+  .tag.missing { background: color-mix(in srgb, var(--muted) 18%, transparent); color: var(--muted); }
+  .holidays ul { list-style: none; margin: 0; padding: 0; }
+  .holidays li { padding: .3rem 0; border-bottom: 1px solid var(--border); font-size: .9rem; }
+  .holidays li:last-child { border-bottom: none; }
+  .holidays label { display: flex; align-items: center; gap: .5rem; cursor: pointer; }
+  .muted { color: var(--muted); font-size: .85rem; }
+  .warn-box { background: color-mix(in srgb, var(--warn) 15%, transparent); border: 1px solid var(--warn); color: var(--warn); border-radius: 10px; padding: .7rem .9rem; font-size: .88rem; margin-bottom: 1rem; }
+  .err-box { background: color-mix(in srgb, var(--bad) 15%, transparent); border: 1px solid var(--bad); color: var(--bad); border-radius: 10px; padding: .7rem .9rem; font-size: .88rem; }
+  footer { text-align: center; color: var(--muted); font-size: .78rem; margin-top: 2rem; }
+  h2 { font-size: 1rem; margin: 0 0 .8rem; }
+  .hidden { display: none !important; }
+  a { color: var(--accent); }
+</style>
+
+<div class="wrap">
+  <h1>Docházka – přepočet odpracovaných hodin</h1>
+  <div class="sub">Vše se počítá přímo v prohlížeči — soubor s docházkou nikam neodchází.</div>
+
+  <div class="card">
+    <div id="drop" class="drop">
+      <div><strong>Přetáhni sem .xlsx soubor</strong> s docházkou<br>nebo klikni pro výběr</div>
+    </div>
+    <input type="file" id="fileInput" accept=".xlsx">
+    <div id="fileError" class="err-box hidden" style="margin-top:1rem;"></div>
+  </div>
+
+  <div id="app" class="hidden">
+    <div class="card">
+      <div class="row2">
+        <div class="field-block" id="employeeBlock">
+          <label class="field">Zaměstnanec</label>
+          <select id="employeeSelect"></select>
+        </div>
+        <div class="field-block" id="monthBlock">
+          <label class="field">Měsíc</label>
+          <select id="monthSelect"></select>
+        </div>
+      </div>
+      <div class="field-block" style="margin-top:1rem;">
+        <label class="field">Kolik musíš odpracovat denně?</label>
+        <div class="row2">
+          <div>
+            <label class="field" for="targetHoursH">Hodiny</label>
+            <input type="number" id="targetHoursH" step="1" min="0" max="23">
+          </div>
+          <div>
+            <label class="field" for="targetHoursM">Minuty</label>
+            <input type="number" id="targetHoursM" step="1" min="0" max="59">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card holidays">
+      <h2>Svátky v tomto měsíci</h2>
+      <div id="czechHolidays"></div>
+      <div id="jewishHolidays" style="margin-top:.75rem;"></div>
+      <div id="noHolidays" class="muted hidden">V tomto měsíci nevychází žádný svátek (ani český, ani žádný z hebrejského kalendáře).</div>
+    </div>
+
+    <div class="card">
+      <h2>Souhrn</h2>
+      <div id="incompleteWarn" class="warn-box hidden"></div>
+      <div class="stats">
+        <div class="stat"><div class="label">Pracovních dní v měsíci</div><div class="value" id="statWorkdays">–</div></div>
+        <div class="stat"><div class="label">Odpracováno</div><div class="value" id="statWorked">–</div></div>
+        <div class="stat"><div class="label">Zbývá odpracovat</div><div class="value" id="statRemaining">–</div></div>
+        <div class="stat"><div class="label">Denní průměr do konce měsíce</div><div class="value" id="statPerDay">–</div></div>
+      </div>
+      <div class="progress"><div id="progressBar" style="width:0%"></div></div>
+    </div>
+
+    <div class="card">
+      <h2>Dny v měsíci</h2>
+      <table>
+        <thead><tr><th>Datum</th><th>Den</th><th>Odpracováno</th><th>Stav</th></tr></thead>
+        <tbody id="dayTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<footer>Data se zpracovávají lokálně v prohlížeči, nic se nikam neodesílá.</footer>
+
+<script>
+'use strict';
+
+/* ---------------- ZIP + XML plumbing ---------------- */
+
+function readU16(b, o) { return b[o] | (b[o + 1] << 8); }
+function readU32(b, o) { return (b[o] | (b[o + 1] << 8) | (b[o + 2] << 16) | (b[o + 3] << 24)) >>> 0; }
+
+async function inflateRaw(bytes) {
+  const ds = new DecompressionStream('deflate-raw');
+  const stream = new Blob([bytes]).stream().pipeThrough(ds);
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function unzip(buf) {
+  let eocd = -1;
+  for (let i = buf.length - 22; i >= 0; i--) {
+    if (readU32(buf, i) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd === -1) throw new Error('Nepodařilo se přečíst .xlsx (chybí konec ZIP archivu).');
+  const cdOffset = readU32(buf, eocd + 16);
+  const cdEntries = readU16(buf, eocd + 10);
+  const files = {};
+  let off = cdOffset;
+  for (let n = 0; n < cdEntries; n++) {
+    if (readU32(buf, off) !== 0x02014b50) throw new Error('Poškozený .xlsx soubor (neplatná ZIP struktura).');
+    const method = readU16(buf, off + 10);
+    const compSize = readU32(buf, off + 20);
+    const nameLen = readU16(buf, off + 28);
+    const extraLen = readU16(buf, off + 30);
+    const commentLen = readU16(buf, off + 32);
+    const localOff = readU32(buf, off + 42);
+    const name = new TextDecoder('utf-8').decode(buf.slice(off + 46, off + 46 + nameLen));
+    const lNameLen = readU16(buf, localOff + 26);
+    const lExtraLen = readU16(buf, localOff + 28);
+    const dataStart = localOff + 30 + lNameLen + lExtraLen;
+    const compData = buf.slice(dataStart, dataStart + compSize);
+    files[name] = method === 0 ? compData : await inflateRaw(compData);
+    off += 46 + nameLen + extraLen + commentLen;
+  }
+  return files;
+}
+
+function parseXml(text) {
+  return new DOMParser().parseFromString(text, 'application/xml');
+}
+
+function colLetters(ref) {
+  const m = /^([A-Z]+)\d+$/.exec(ref);
+  return m ? m[1] : null;
+}
+
+function getCellRaw(cellEl) {
+  if (!cellEl) return null;
+  const t = cellEl.getAttribute('t') || 'n';
+  if (t === 'inlineStr') {
+    const tEl = cellEl.querySelector('is > t');
+    return tEl ? { type: 'str', value: tEl.textContent } : null;
+  }
+  const vEl = cellEl.querySelector('v');
+  if (!vEl) return null;
+  return { type: t, value: vEl.textContent };
+}
+
+function resolveString(raw, sharedStrings) {
+  if (!raw) return null;
+  if (raw.type === 's') return sharedStrings[parseInt(raw.value, 10)] ?? null;
+  return raw.value;
+}
+
+/* duration text like "PT7H53M0.000S" -> minutes since midnight */
+function parseDurationToMinutes(v) {
+  const m = /^PT(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)M)?(?:(\d+(?:\.\d+)?)S)?$/.exec(v);
+  if (!m) return null;
+  const h = parseFloat(m[1] || 0), mi = parseFloat(m[2] || 0), s = parseFloat(m[3] || 0);
+  return h * 60 + mi + s / 60;
+}
+
+/* "HH:MM" or "-HH:MM" text -> minutes */
+function parseClockText(v) {
+  const m = /^(-?)(\d+):(\d{2})$/.exec((v || '').trim());
+  if (!m) return null;
+  const sign = m[1] === '-' ? -1 : 1;
+  return sign * (parseInt(m[2], 10) * 60 + parseInt(m[3], 10));
+}
+
+/* resolve a raw cell to "minutes since midnight", trying every format this exporter is known to use */
+function toMinutesOfDay(raw, sharedStrings) {
+  if (!raw) return null;
+  if (raw.type === 'd') {
+    if (raw.value.startsWith('P')) return parseDurationToMinutes(raw.value);
+    return null; // it's actually a date, not a time
+  }
+  if (raw.type === 's') return parseClockText(sharedStrings[parseInt(raw.value, 10)]);
+  if (raw.type === 'str' || raw.type === 'inlineStr') return parseClockText(raw.value);
+  // plain numeric excel time serial (fraction of a day)
+  const num = parseFloat(raw.value);
+  if (!isNaN(num)) {
+    const frac = num - Math.floor(num);
+    return Math.round(frac * 24 * 60);
+  }
+  return null;
+}
+
+/* resolve a raw cell to an ISO date string "YYYY-MM-DD" */
+const EXCEL_EPOCH = Date.UTC(1899, 11, 30);
+function toDateISO(raw) {
+  if (!raw) return null;
+  if (raw.type === 'd' && /^\d{4}-\d{2}-\d{2}/.test(raw.value)) return raw.value.slice(0, 10);
+  const num = parseFloat(raw.value);
+  if (!isNaN(num)) {
+    const ms = EXCEL_EPOCH + Math.round(num) * 86400000;
+    return new Date(ms).toISOString().slice(0, 10);
+  }
+  return null;
+}
+
+/* ---------------- workbook parsing ---------------- */
+
+async function parseWorkbook(arrayBuffer) {
+  const files = await unzip(new Uint8Array(arrayBuffer));
+  const dec = new TextDecoder('utf-8');
+
+  // resolve first worksheet path via workbook.xml + rels (robust to different export layouts)
+  let sheetPath = 'xl/worksheets/sheet1.xml';
+  try {
+    const wbXml = parseXml(dec.decode(files['xl/workbook.xml']));
+    const firstSheet = wbXml.querySelector('sheets > sheet');
+    const rId = firstSheet && firstSheet.getAttributeNS('http://purl.oclc.org/ooxml/officeDocument/relationships', 'id')
+      || firstSheet?.getAttribute('r:id');
+    const relsXml = parseXml(dec.decode(files['xl/_rels/workbook.xml.rels']));
+    const rel = [...relsXml.getElementsByTagName('Relationship')].find(r => r.getAttribute('Id') === rId);
+    if (rel) sheetPath = 'xl/' + rel.getAttribute('Target').replace(/^\/?/, '');
+  } catch (e) { /* fall back to default path */ }
+
+  const sharedStrings = [];
+  if (files['xl/sharedStrings.xml']) {
+    const ssXml = parseXml(dec.decode(files['xl/sharedStrings.xml']));
+    for (const si of ssXml.getElementsByTagName('si')) {
+      const runs = si.querySelectorAll('t');
+      sharedStrings.push([...runs].map(t => t.textContent).join(''));
+    }
+  }
+
+  if (!files[sheetPath]) throw new Error('V souboru nenacházím list s daty (' + sheetPath + ').');
+  const sheetXml = parseXml(dec.decode(files[sheetPath]));
+  const rowEls = [...sheetXml.getElementsByTagName('row')];
+  if (!rowEls.length) throw new Error('List je prázdný.');
+
+  // find header row: first row containing a cell resolving to "Date"
+  let headerRow = null, headerMap = {};
+  for (const rowEl of rowEls.slice(0, 5)) {
+    const map = {};
+    for (const c of rowEl.getElementsByTagName('c')) {
+      const col = colLetters(c.getAttribute('r'));
+      const raw = getCellRaw(c);
+      const text = resolveString(raw, sharedStrings);
+      if (col && text != null) map[col] = text.trim();
+    }
+    if (Object.values(map).some(v => v.toLowerCase() === 'date')) { headerRow = rowEl; headerMap = map; break; }
+  }
+  if (!headerRow) throw new Error('Nenašel jsem hlavičkový řádek se sloupcem "Date".');
+
+  const nameToCol = {};
+  for (const [col, name] of Object.entries(headerMap)) nameToCol[name] = col;
+  const dateCol = nameToCol['Date'];
+  const employeeCol = nameToCol['Employee'];
+  if (!dateCol) throw new Error('Nenašel jsem sloupec "Date".');
+
+  const shiftPairs = [];
+  for (let n = 1; n <= 20; n++) {
+    const inCol = nameToCol['In ' + n], outCol = nameToCol['Out ' + n];
+    if (inCol && outCol) shiftPairs.push([inCol, outCol]);
+  }
+  if (!shiftPairs.length) throw new Error('Nenašel jsem žádné sloupce "In N" / "Out N".');
+
+  const headerRowNum = parseInt(headerRow.getAttribute('r'), 10);
+  const rows = [];
+  for (const rowEl of rowEls) {
+    if (parseInt(rowEl.getAttribute('r'), 10) === headerRowNum) continue;
+    const cells = {};
+    for (const c of rowEl.getElementsByTagName('c')) {
+      const col = colLetters(c.getAttribute('r'));
+      if (col) cells[col] = getCellRaw(c);
+    }
+    const dateISO = toDateISO(cells[dateCol]);
+    if (!dateISO) continue;
+    const employee = employeeCol ? resolveString(cells[employeeCol], sharedStrings) : null;
+
+    let workedMinutes = 0, isOpen = false, hasAnyShift = false;
+    for (const [inCol, outCol] of shiftPairs) {
+      const inMin = toMinutesOfDay(cells[inCol], sharedStrings);
+      const outMin = toMinutesOfDay(cells[outCol], sharedStrings);
+      if (inMin != null) hasAnyShift = true;
+      if (inMin != null && outMin != null) {
+        let diff = outMin - inMin;
+        if (diff < 0) diff += 24 * 60;
+        workedMinutes += diff;
+      } else if (inMin != null && outMin == null) {
+        isOpen = true;
+      }
+    }
+    rows.push({ dateISO, employee, workedMinutes, isOpen, hasAnyShift });
+  }
+  rows.sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+  return rows;
+}
+
+/* ---------------- Czech holidays ---------------- */
+
+function toISO(date) { return date.toISOString().slice(0, 10); }
+function dISO(y, m0, d) { return toISO(new Date(Date.UTC(y, m0, d))); }
+
+function easterSundayUTC(year) {
+  const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+  const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(Date.UTC(year, month - 1, day));
+}
+
+function czechHolidays(year) {
+  const easter = easterSundayUTC(year);
+  const goodFriday = new Date(easter); goodFriday.setUTCDate(easter.getUTCDate() - 2);
+  const easterMonday = new Date(easter); easterMonday.setUTCDate(easter.getUTCDate() + 1);
+  return [
+    { date: dISO(year, 0, 1), name: 'Nový rok / Den obnovy samostatného českého státu' },
+    { date: toISO(goodFriday), name: 'Velký pátek' },
+    { date: toISO(easterMonday), name: 'Velikonoční pondělí' },
+    { date: dISO(year, 4, 1), name: 'Svátek práce' },
+    { date: dISO(year, 4, 8), name: 'Den vítězství' },
+    { date: dISO(year, 6, 5), name: 'Den slovanských věrozvěstů Cyrila a Metoděje' },
+    { date: dISO(year, 6, 6), name: 'Den upálení mistra Jana Husa' },
+    { date: dISO(year, 8, 28), name: 'Den české státnosti' },
+    { date: dISO(year, 9, 28), name: 'Den vzniku samostatného československého státu' },
+    { date: dISO(year, 10, 17), name: 'Den boje za svobodu a demokracii' },
+    { date: dISO(year, 11, 24), name: 'Štědrý den' },
+    { date: dISO(year, 11, 25), name: '1. svátek vánoční' },
+    { date: dISO(year, 11, 26), name: '2. svátek vánoční' },
+  ];
+}
+
+/* ---------------- Jewish holidays (via native Hebrew calendar, no hardcoded dates) ---------------- */
+
+const JEWISH_TABLE = [
+  { month: 'Tishri', day: 1, name: 'Roš ha-šana (1. den)', def: true },
+  { month: 'Tishri', day: 2, name: 'Roš ha-šana (2. den)', def: true },
+  { month: 'Tishri', day: 10, name: 'Jom kipur', def: true },
+  { month: 'Tishri', day: 15, name: 'Sukot (1. den)', def: true },
+  { month: 'Tishri', day: 21, name: 'Hošana raba', def: false },
+  { month: 'Tishri', day: 22, name: 'Šmini aceret / Simchat tora', def: true },
+  { month: 'Kislev', day: 25, name: 'Chanuka (1. den)', def: false },
+  { month: 'Adar', day: 14, name: 'Purim', def: false },
+  { month: 'Adar II', day: 14, name: 'Purim', def: false },
+  { month: 'Nisan', day: 15, name: 'Pesach (1. den)', def: true },
+  { month: 'Nisan', day: 21, name: 'Pesach (7. den)', def: true },
+  { month: 'Iyar', day: 5, name: 'Jom ha-acmaut (Den nezávislosti Izraele)*', def: false },
+  { month: 'Sivan', day: 6, name: 'Šavuot', def: true },
+  { month: 'Av', day: 9, name: 'Tiša be-av (půst)', def: false },
+];
+
+const hebrewFmtCache = new Intl.DateTimeFormat('en-u-ca-hebrew', { month: 'long', day: 'numeric' });
+
+function jewishHolidaysForGregorianYear(year) {
+  const out = [];
+  const d = new Date(Date.UTC(year, 0, 1));
+  const end = new Date(Date.UTC(year, 11, 31));
+  while (d <= end) {
+    const parts = hebrewFmtCache.formatToParts(d);
+    const map = Object.fromEntries(parts.map(p => [p.type, p.value]));
+    const hMonth = map.month, hDay = parseInt(map.day, 10);
+    for (const h of JEWISH_TABLE) {
+      if (h.month === hMonth && h.day === hDay) out.push({ date: toISO(d), name: h.name, def: h.def });
+    }
+    d.setUTCDate(d.getUTCDate() + 1);
+  }
+  return out;
+}
+
+/* ---------------- formatting helpers ---------------- */
+
+function fmtHM(min) {
+  const sign = min < 0 ? '-' : '';
+  min = Math.round(Math.abs(min));
+  return `${sign}${Math.floor(min / 60)}h ${String(min % 60).padStart(2, '0')}m`;
+}
+const WEEKDAYS_CZ = ['Ne', 'Po', 'Út', 'St', 'Čt', 'Pá', 'So'];
+const MONTHS_CZ = ['leden', 'únor', 'březen', 'duben', 'květen', 'červen', 'červenec', 'srpen', 'září', 'říjen', 'listopad', 'prosinec'];
+
+function daysInMonth(year, month0) { return new Date(Date.UTC(year, month0 + 1, 0)).getUTCDate(); }
+
+/* ---------------- app state & rendering ---------------- */
+
+const LS_TARGET_H = 'oc_target_h';
+const LS_TARGET_M = 'oc_target_m';
+const LS_JEWISH_PREFIX = 'oc_jewish_';
+const DEFAULT_TARGET_H = 6;
+const DEFAULT_TARGET_M = 24;
+
+let allRows = [];
+let jewishPrefFor = {}; // name -> bool, populated per render
+
+function el(id) { return document.getElementById(id); }
+
+function populateSelectors() {
+  const employees = [...new Set(allRows.map(r => r.employee).filter(Boolean))];
+  const empSelect = el('employeeSelect');
+  empSelect.innerHTML = '';
+  if (employees.length <= 1) {
+    el('employeeBlock').classList.add('hidden');
+  } else {
+    el('employeeBlock').classList.remove('hidden');
+    for (const e of employees) {
+      const opt = document.createElement('option'); opt.value = e; opt.textContent = e;
+      empSelect.appendChild(opt);
+    }
+  }
+  const currentEmployee = employees.length ? (empSelect.value || employees[0]) : null;
+  if (currentEmployee) empSelect.value = currentEmployee;
+
+  const rowsForEmp = employees.length ? allRows.filter(r => r.employee === currentEmployee) : allRows;
+  const months = [...new Set(rowsForEmp.map(r => r.dateISO.slice(0, 7)))].sort();
+  const monthSelect = el('monthSelect');
+  monthSelect.innerHTML = '';
+  for (const m of months) {
+    const [y, mo] = m.split('-').map(Number);
+    const opt = document.createElement('option'); opt.value = m; opt.textContent = `${MONTHS_CZ[mo - 1]} ${y}`;
+    monthSelect.appendChild(opt);
+  }
+  if (months.length <= 1) el('monthBlock').classList.add('hidden'); else el('monthBlock').classList.remove('hidden');
+  if (months.length) monthSelect.value = months[months.length - 1];
+}
+
+function currentSelection() {
+  const employees = [...new Set(allRows.map(r => r.employee).filter(Boolean))];
+  const employee = employees.length ? (el('employeeSelect').value || employees[0]) : null;
+  const monthVal = el('monthSelect').value;
+  const [year, month1] = monthVal.split('-').map(Number);
+  return { employee, year, month0: month1 - 1 };
+}
+
+function render() {
+  if (!allRows.length) return;
+  const { employee, year, month0 } = currentSelection();
+  const rowsForMonth = allRows.filter(r =>
+    (employee ? r.employee === employee : true) &&
+    r.dateISO.slice(0, 7) === `${year}-${String(month0 + 1).padStart(2, '0')}`
+  );
+  const byDate = Object.fromEntries(rowsForMonth.map(r => [r.dateISO, r]));
+
+  const czech = czechHolidays(year).filter(h => h.date.slice(0, 7) === `${year}-${String(month0 + 1).padStart(2, '0')}`);
+  const jewishAll = jewishHolidaysForGregorianYear(year).filter(h => h.date.slice(0, 7) === `${year}-${String(month0 + 1).padStart(2, '0')}`);
+
+  // render holiday lists
+  const czechBox = el('czechHolidays');
+  czechBox.innerHTML = czech.length
+    ? `<div class="muted" style="margin-bottom:.3rem;">České státní svátky (odečítají se automaticky):</div><ul>${czech.map(h => `<li>${h.date.slice(8)}. – ${h.name}</li>`).join('')}</ul>`
+    : '';
+
+  const jewishBox = el('jewishHolidays');
+  if (jewishAll.length) {
+    jewishBox.innerHTML = `<div class="muted" style="margin-bottom:.3rem;">Svátky z hebrejského kalendáře (zaškrtni, pokud se u vás nepracuje):</div>` +
+      `<ul>${jewishAll.map(h => {
+        const key = LS_JEWISH_PREFIX + h.name;
+        const stored = localStorage.getItem(key);
+        const checked = stored !== null ? stored === '1' : h.def;
+        return `<li><label><input type="checkbox" data-name="${encodeURIComponent(h.name)}" class="jewishCb" ${checked ? 'checked' : ''}> ${h.date.slice(8)}. – ${h.name}</label></li>`;
+      }).join('')}</ul>` +
+      (jewishAll.some(h => h.name.includes('*')) ? `<div class="muted" style="margin-top:.3rem;">* Datum se v Izraeli může posouvat kvůli šabatu, ověř prosím oficiální zdroj.</div>` : '');
+    jewishBox.querySelectorAll('.jewishCb').forEach(cb => {
+      cb.addEventListener('change', () => {
+        localStorage.setItem(LS_JEWISH_PREFIX + decodeURIComponent(cb.dataset.name), cb.checked ? '1' : '0');
+        render();
+      });
+    });
+  } else {
+    jewishBox.innerHTML = '';
+  }
+  el('noHolidays').classList.toggle('hidden', czech.length + jewishAll.length > 0);
+
+  const excludedDates = new Set(czech.map(h => h.date));
+  for (const h of jewishAll) {
+    const stored = localStorage.getItem(LS_JEWISH_PREFIX + h.name);
+    const checked = stored !== null ? stored === '1' : h.def;
+    if (checked) excludedDates.add(h.date);
+  }
+
+  // build full month day list
+  const totalDays = daysInMonth(year, month0);
+  const dayList = [];
+  for (let d = 1; d <= totalDays; d++) {
+    const date = new Date(Date.UTC(year, month0, d));
+    const iso = toISO(date);
+    const dow = date.getUTCDay();
+    const isWeekend = dow === 0 || dow === 6;
+    const isHoliday = excludedDates.has(iso);
+    const isWorkday = !isWeekend && !isHoliday;
+    dayList.push({ iso, dow, isWorkday, record: byDate[iso] || null });
+  }
+
+  const workdays = dayList.filter(d => d.isWorkday);
+  const workdaysCount = workdays.length;
+
+  let workedMinutes = 0;
+  for (const d of workdays) if (d.record) workedMinutes += d.record.workedMinutes;
+
+  // cutoff = last date with any record in this month (defines "so far" vs "remaining")
+  const recordedDates = rowsForMonth.map(r => r.dateISO).sort();
+  const cutoff = recordedDates.length ? recordedDates[recordedDates.length - 1] : null;
+  const cutoffRecord = cutoff ? byDate[cutoff] : null;
+  const cutoffOpen = cutoffRecord ? cutoffRecord.isOpen : false;
+
+  let remainingWorkdays = 0;
+  for (const d of workdays) {
+    if (!cutoff || d.iso > cutoff) remainingWorkdays++;
+    else if (d.iso === cutoff && cutoffOpen) remainingWorkdays++;
+  }
+
+  const targetH = parseFloat(el('targetHoursH').value) || 0;
+  const targetM = parseFloat(el('targetHoursM').value) || 0;
+  const targetMinutesPerDay = targetH * 60 + targetM;
+  const targetTotalMinutes = workdaysCount * targetMinutesPerDay;
+  const remainingMinutes = targetTotalMinutes - workedMinutes;
+
+  el('statWorkdays').textContent = workdaysCount;
+  el('statWorked').textContent = fmtHM(workedMinutes);
+  const remEl = el('statRemaining');
+  remEl.textContent = remainingMinutes > 0 ? fmtHM(remainingMinutes) : ('splněno, +' + fmtHM(-remainingMinutes));
+  remEl.className = 'value ' + (remainingMinutes > 0 ? '' : 'ok');
+
+  const perDayEl = el('statPerDay');
+  const warnBox = el('incompleteWarn');
+  if (remainingMinutes <= 0) {
+    perDayEl.textContent = '–';
+    perDayEl.className = 'value';
+    warnBox.classList.add('hidden');
+  } else if (remainingWorkdays <= 0) {
+    perDayEl.textContent = '–';
+    perDayEl.className = 'value bad';
+    warnBox.textContent = 'V měsíci už nezbývá dost pracovních dní na dosažení normy podle aktuálních dat.';
+    warnBox.classList.remove('hidden');
+  } else {
+    perDayEl.textContent = fmtHM(remainingMinutes / remainingWorkdays);
+    perDayEl.className = 'value';
+    warnBox.classList.add('hidden');
+  }
+
+  const progressPct = targetTotalMinutes > 0 ? Math.min(100, Math.max(0, (workedMinutes / targetTotalMinutes) * 100)) : 0;
+  el('progressBar').style.width = progressPct + '%';
+
+  // table
+  const tbody = el('dayTable');
+  tbody.innerHTML = '';
+  for (const d of dayList) {
+    if (!d.isWorkday && !d.record) continue; // skip plain weekends/holidays with nothing to show
+    const tr = document.createElement('tr');
+    if (d.iso === cutoff) tr.classList.add('today');
+    const dateLabel = `${d.iso.slice(8)}.${d.iso.slice(5, 7)}.`;
+    let statusHtml, workedLabel;
+    if (!d.isWorkday) {
+      statusHtml = '<span class="tag missing">svátek</span>';
+      workedLabel = d.record ? fmtHM(d.record.workedMinutes) : '–';
+    } else if (!d.record) {
+      statusHtml = '<span class="tag missing">bez záznamu</span>';
+      workedLabel = '–';
+    } else if (d.record.isOpen) {
+      statusHtml = '<span class="tag open">v průběhu</span>';
+      workedLabel = fmtHM(d.record.workedMinutes);
+    } else {
+      statusHtml = '<span class="tag ok">hotovo</span>';
+      workedLabel = fmtHM(d.record.workedMinutes);
+    }
+    tr.innerHTML = `<td>${dateLabel}</td><td>${WEEKDAYS_CZ[d.dow]}</td><td>${workedLabel}</td><td>${statusHtml}</td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+/* ---------------- file handling ---------------- */
+
+async function handleFile(file) {
+  el('fileError').classList.add('hidden');
+  try {
+    const buf = await file.arrayBuffer();
+    allRows = await parseWorkbook(buf);
+    if (!allRows.length) throw new Error('V souboru jsem nenašel žádné řádky s daty.');
+    el('app').classList.remove('hidden');
+    populateSelectors();
+    render();
+  } catch (err) {
+    console.error(err);
+    el('fileError').textContent = 'Nepodařilo se zpracovat soubor: ' + err.message;
+    el('fileError').classList.remove('hidden');
+    el('app').classList.add('hidden');
+  }
+}
+
+function init() {
+  if (typeof DecompressionStream === 'undefined' || typeof DOMParser === 'undefined') {
+    el('fileError').textContent = 'Tvůj prohlížeč nepodporuje potřebné funkce. Zkus aktuální verzi Chrome, Edge, Firefox nebo Safari.';
+    el('fileError').classList.remove('hidden');
+    return;
+  }
+  const drop = el('drop'), fileInput = el('fileInput');
+  drop.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('drag');
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+
+  const targetHInput = el('targetHoursH'), targetMInput = el('targetHoursM');
+  const savedH = localStorage.getItem(LS_TARGET_H);
+  const savedM = localStorage.getItem(LS_TARGET_M);
+  targetHInput.value = savedH !== null ? savedH : DEFAULT_TARGET_H;
+  targetMInput.value = savedM !== null ? savedM : DEFAULT_TARGET_M;
+  const saveTarget = () => {
+    localStorage.setItem(LS_TARGET_H, targetHInput.value);
+    localStorage.setItem(LS_TARGET_M, targetMInput.value);
+    render();
+  };
+  targetHInput.addEventListener('input', saveTarget);
+  targetMInput.addEventListener('input', saveTarget);
+
+  el('employeeSelect').addEventListener('change', () => { populateSelectors(); render(); });
+  el('monthSelect').addEventListener('change', render);
+}
+
+init();
+</script>
