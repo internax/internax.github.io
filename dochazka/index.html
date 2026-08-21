@@ -196,16 +196,44 @@ function colLetters(ref) {
   return m ? m[1] : null;
 }
 
+/* Different exporters bind the main SpreadsheetML schema to the default
+   namespace (<row>, <c>, <v>...) or to an explicit prefix (<x:row>, <x:c>,
+   <x:v>...). tagName-based DOM lookups only match one or the other, so all
+   traversal here goes through localName instead, which is prefix-agnostic. */
+function byLocalName(root, name) {
+  const out = [];
+  for (const el of root.getElementsByTagName('*')) if (el.localName === name) out.push(el);
+  return out;
+}
+function firstChildByLocalName(el, name) {
+  for (const c of el.children) if (c.localName === name) return c;
+  return null;
+}
+function firstDescendantChildByLocalName(root, parentName, childName) {
+  for (const p of byLocalName(root, parentName)) {
+    const c = firstChildByLocalName(p, childName);
+    if (c) return c;
+  }
+  return null;
+}
+
+/* OOXML escapes otherwise-unsafe characters in string content as _xHHHH_
+   (e.g. a space becomes "_x0020_"); some exporters apply this liberally. */
+function decodeOoxmlEscapes(s) {
+  if (s == null) return s;
+  return s.replace(/_x([0-9A-Fa-f]{4})_/g, (m, hex) => String.fromCharCode(parseInt(hex, 16)));
+}
+
 function getCellRaw(cellEl) {
   if (!cellEl) return null;
   const t = cellEl.getAttribute('t') || 'n';
   if (t === 'inlineStr') {
-    const tEl = cellEl.querySelector('is > t');
-    return tEl ? { type: 'str', value: tEl.textContent } : null;
+    const tEl = firstDescendantChildByLocalName(cellEl, 'is', 't');
+    return tEl ? { type: 'str', value: decodeOoxmlEscapes(tEl.textContent) } : null;
   }
-  const vEl = cellEl.querySelector('v');
-  if (!vEl) return null;
-  return { type: t, value: vEl.textContent };
+  const vEl = firstChildByLocalName(cellEl, 'v');
+  if (!vEl || vEl.textContent === '') return null;
+  return { type: t, value: decodeOoxmlEscapes(vEl.textContent) };
 }
 
 function resolveString(raw, sharedStrings) {
@@ -271,33 +299,32 @@ async function parseWorkbook(arrayBuffer) {
   let sheetPath = 'xl/worksheets/sheet1.xml';
   try {
     const wbXml = parseXml(dec.decode(files['xl/workbook.xml']));
-    const firstSheet = wbXml.querySelector('sheets > sheet');
-    const rId = firstSheet && firstSheet.getAttributeNS('http://purl.oclc.org/ooxml/officeDocument/relationships', 'id')
-      || firstSheet?.getAttribute('r:id');
+    const firstSheet = firstDescendantChildByLocalName(wbXml, 'sheets', 'sheet');
+    const rId = firstSheet && firstSheet.getAttribute('r:id');
     const relsXml = parseXml(dec.decode(files['xl/_rels/workbook.xml.rels']));
-    const rel = [...relsXml.getElementsByTagName('Relationship')].find(r => r.getAttribute('Id') === rId);
+    const rel = byLocalName(relsXml, 'Relationship').find(r => r.getAttribute('Id') === rId);
     if (rel) sheetPath = 'xl/' + rel.getAttribute('Target').replace(/^\/?/, '');
   } catch (e) { /* fall back to default path */ }
 
   const sharedStrings = [];
   if (files['xl/sharedStrings.xml']) {
     const ssXml = parseXml(dec.decode(files['xl/sharedStrings.xml']));
-    for (const si of ssXml.getElementsByTagName('si')) {
-      const runs = si.querySelectorAll('t');
-      sharedStrings.push([...runs].map(t => t.textContent).join(''));
+    for (const si of byLocalName(ssXml, 'si')) {
+      const runs = byLocalName(si, 't');
+      sharedStrings.push(decodeOoxmlEscapes(runs.map(t => t.textContent).join('')));
     }
   }
 
   if (!files[sheetPath]) throw new Error('V souboru nenacházím list s daty (' + sheetPath + ').');
   const sheetXml = parseXml(dec.decode(files[sheetPath]));
-  const rowEls = [...sheetXml.getElementsByTagName('row')];
+  const rowEls = byLocalName(sheetXml, 'row');
   if (!rowEls.length) throw new Error('List je prázdný.');
 
   // find header row: first row containing a cell resolving to "Date"
   let headerRow = null, headerMap = {};
   for (const rowEl of rowEls.slice(0, 5)) {
     const map = {};
-    for (const c of rowEl.getElementsByTagName('c')) {
+    for (const c of byLocalName(rowEl, 'c')) {
       const col = colLetters(c.getAttribute('r'));
       const raw = getCellRaw(c);
       const text = resolveString(raw, sharedStrings);
@@ -326,7 +353,7 @@ async function parseWorkbook(arrayBuffer) {
   for (const rowEl of rowEls) {
     if (parseInt(rowEl.getAttribute('r'), 10) === headerRowNum) continue;
     const cells = {};
-    for (const c of rowEl.getElementsByTagName('c')) {
+    for (const c of byLocalName(rowEl, 'c')) {
       const col = colLetters(c.getAttribute('r'));
       if (col) cells[col] = getCellRaw(c);
     }
