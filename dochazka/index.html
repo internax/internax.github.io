@@ -121,6 +121,7 @@
 
     <div class="card">
       <h2>Souhrn</h2>
+      <div id="dataSourceNote" class="muted" style="margin-bottom:.75rem;"></div>
       <div id="incompleteWarn" class="warn-box hidden"></div>
       <div class="stats">
         <div class="stat"><div class="label">Pracovních dní v měsíci</div><div class="value" id="statWorkdays">–</div></div>
@@ -318,6 +319,7 @@ async function parseWorkbook(arrayBuffer) {
     if (inCol && outCol) shiftPairs.push([inCol, outCol]);
   }
   if (!shiftPairs.length) throw new Error('Nenašel jsem žádné sloupce "In N" / "Out N".');
+  const totalWageCol = nameToCol['Total Wage'];
 
   const headerRowNum = parseInt(headerRow.getAttribute('r'), 10);
   const rows = [];
@@ -345,9 +347,19 @@ async function parseWorkbook(arrayBuffer) {
         isOpen = true;
       }
     }
+
+    // prefer the exporter's own "Total Wage" column (includes paid absences) for
+    // finished days; a day that's still open hasn't been totalled by the exporter
+    // yet, so keep the live in/out sum for that one.
+    if (totalWageCol && !isOpen) {
+      const twMin = toMinutesOfDay(cells[totalWageCol], sharedStrings);
+      if (twMin != null) workedMinutes = twMin;
+    }
+
     rows.push({ dateISO, employee, workedMinutes, isOpen, hasAnyShift });
   }
   rows.sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+  rows.usedTotalWage = Boolean(totalWageCol);
   return rows;
 }
 
@@ -446,6 +458,7 @@ const DEFAULT_TARGET_H = 6;
 const DEFAULT_TARGET_M = 24;
 
 let allRows = [];
+let usedTotalWage = false;
 let jewishPrefFor = {}; // name -> bool, populated per render
 
 function el(id) { return document.getElementById(id); }
@@ -570,6 +583,10 @@ function render() {
   const targetTotalMinutes = workdaysCount * targetMinutesPerDay;
   const remainingMinutes = targetTotalMinutes - workedMinutes;
 
+  el('dataSourceNote').textContent = usedTotalWage
+    ? 'Odpracované hodiny se počítají ze sloupce "Total Wage" (zahrnuje i placené absence); rozpracovaný den se dopočítává živě z In/Out.'
+    : 'Soubor neobsahuje sloupec "Total Wage" — odpracované hodiny se počítají z rozdílu In/Out.';
+
   el('statWorkdays').textContent = workdaysCount;
   el('statWorked').textContent = fmtHM(workedMinutes);
   const remEl = el('statRemaining');
@@ -631,6 +648,7 @@ async function handleFile(file) {
     const buf = await file.arrayBuffer();
     allRows = await parseWorkbook(buf);
     if (!allRows.length) throw new Error('V souboru jsem nenašel žádné řádky s daty.');
+    usedTotalWage = allRows.usedTotalWage;
     el('app').classList.remove('hidden');
     populateSelectors();
     render();
