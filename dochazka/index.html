@@ -1,6 +1,9 @@
-<title>Docházka – přepočet hodin</title>
+<!doctype html>
+<html lang="cs">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docházka – přehled a plánovač</title>
 <style>
   :root {
     --bg: #f4f5f7; --card: #ffffff; --text: #1c1f26; --muted: #6b7280;
@@ -22,29 +25,49 @@
   }
   .wrap { max-width: 780px; margin: 0 auto; }
   h1 { font-size: 1.4rem; margin: 0 0 .25rem; }
+  h2 { font-size: 1rem; margin: 0 0 .8rem; }
   .sub { color: var(--muted); font-size: .9rem; margin-bottom: 1.5rem; }
   .card {
     background: var(--card); border: 1px solid var(--border); border-radius: 12px;
     padding: 1.25rem; margin-bottom: 1.25rem;
   }
   .drop {
-    border: 2px dashed var(--border); border-radius: 12px; padding: 2.5rem 1rem;
+    border: 2px dashed var(--border); border-radius: 12px; padding: 2rem 1rem;
     text-align: center; cursor: pointer; color: var(--muted); transition: border-color .15s, background .15s;
   }
   .drop.drag { border-color: var(--accent); background: var(--accent-bg); }
   .drop strong { color: var(--text); }
   input[type=file] { display: none; }
-  label.field { display: block; font-size: .85rem; color: var(--muted); margin-bottom: .3rem; }
+  label.field, span.field { display: block; font-size: .85rem; color: var(--muted); margin-bottom: .3rem; }
   select, input[type=number] {
     width: 100%; padding: .55rem .6rem; border-radius: 8px; border: 1px solid var(--border);
     background: var(--bg); color: var(--text); font-size: 1rem;
   }
+  input[type=time], input[type=text] {
+    padding: .45rem .5rem; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); font-size: 1rem;
+  }
+  button {
+    font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: .45rem .8rem; cursor: pointer;
+  }
+  button:disabled { opacity: .45; cursor: default; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   @media (max-width: 560px) { .row2 { grid-template-columns: 1fr; } }
   .field-block { margin-bottom: 1rem; }
   .field-block:last-child { margin-bottom: 0; }
+  .mesic { display: flex; align-items: center; gap: .75rem; }
+  .mesic strong { min-width: 9rem; text-align: center; }
+  .tabs { display: flex; gap: .5rem; margin-bottom: 1.25rem; }
+  .tabs button { flex: 1; padding: .6rem; font-weight: 600; }
+  .tabs button[aria-selected="true"] { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+  .grid-nastaveni { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; }
+  .hm { display: flex; gap: .4rem; align-items: center; }
+  .hm input[type=number] { width: 4.5rem; }
   .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; }
-  @media (max-width: 560px) { .stats { grid-template-columns: 1fr 1fr; } }
+  .stats3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 560px) { .stats, .stats3 { grid-template-columns: 1fr 1fr; } }
   .stat { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: .8rem .9rem; }
   .stat .label { font-size: .78rem; color: var(--muted); margin-bottom: .2rem; }
   .stat .value { font-size: 1.3rem; font-weight: 650; }
@@ -63,662 +86,185 @@
   .holidays ul { list-style: none; margin: 0; padding: 0; }
   .holidays li { padding: .3rem 0; border-bottom: 1px solid var(--border); font-size: .9rem; }
   .holidays li:last-child { border-bottom: none; }
-  .holidays label { display: flex; align-items: center; gap: .5rem; cursor: pointer; }
+  .kalendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: .3rem; margin: .75rem 0; }
+  .kal-hlavicka { text-align: center; font-size: .75rem; color: var(--muted); font-weight: 600; }
+  .kal-den { display: flex; flex-direction: column; align-items: center; padding: .35rem 0; min-height: 3rem; }
+  .kal-znacka { font-size: .8rem; min-height: 1.1em; }
+  .kal-vikend, .kal-svatek { color: var(--muted); background: transparent; border-style: dashed; }
+  .kal-export, .kal-bezZaznamu { color: var(--muted); }
+  .kal-export .kal-znacka { color: var(--ok); }
+  .kal-prace { border-color: var(--accent); }
+  .kal-dovolena { background: color-mix(in srgb, var(--ok) 18%, transparent); border-color: var(--ok); }
+  .kal-nahradni { background: color-mix(in srgb, var(--warn) 18%, transparent); border-color: var(--warn); }
+  .tabulka-obal { overflow-x: auto; }
+  table.plan td { white-space: nowrap; }
+  table.plan select { width: auto; padding: .3rem .4rem; font-size: .88rem; }
+  input.hodiny { width: 4.5rem; }
+  tr.jen-cteni td { color: var(--muted); }
+  button.reset { margin-left: .3rem; padding: .2rem .45rem; font-size: .8rem; }
+  .akce { display: flex; gap: .75rem; flex-wrap: wrap; justify-content: space-between; margin-top: 1rem; }
   .muted { color: var(--muted); font-size: .85rem; }
   .warn-box { background: color-mix(in srgb, var(--warn) 15%, transparent); border: 1px solid var(--warn); color: var(--warn); border-radius: 10px; padding: .7rem .9rem; font-size: .88rem; margin-bottom: 1rem; }
   .err-box { background: color-mix(in srgb, var(--bad) 15%, transparent); border: 1px solid var(--bad); color: var(--bad); border-radius: 10px; padding: .7rem .9rem; font-size: .88rem; }
   footer { text-align: center; color: var(--muted); font-size: .78rem; margin-top: 2rem; }
-  h2 { font-size: 1rem; margin: 0 0 .8rem; }
   .hidden { display: none !important; }
   a { color: var(--accent); }
 </style>
-
+</head>
+<body>
 <div class="wrap">
-  <h1>Docházka – přepočet odpracovaných hodin</h1>
-  <div class="sub">Vše se počítá přímo v prohlížeči — soubor s docházkou nikam neodchází.</div>
+  <h1>Docházka</h1>
+  <div class="sub">Přehled odpracovaných hodin a plán zbytku měsíce. Vše se počítá přímo v prohlížeči — soubor s docházkou nikam neodchází.</div>
 
   <div class="card">
     <div id="drop" class="drop">
-      <div><strong>Přetáhni sem .xlsx soubor</strong> s docházkou<br>nebo klikni pro výběr</div>
+      <div><strong>Přetáhni sem .xlsx export</strong> s docházkou (volitelné)<br>nebo klikni pro výběr</div>
     </div>
     <input type="file" id="fileInput" accept=".xlsx">
+    <div id="fileInfo" class="muted hidden" style="margin-top:.75rem;"></div>
     <div id="fileError" class="err-box hidden" style="margin-top:1rem;"></div>
   </div>
 
-  <div id="app" class="hidden">
-    <div class="card">
-      <div class="row2">
-        <div class="field-block" id="employeeBlock">
-          <label class="field">Zaměstnanec</label>
-          <select id="employeeSelect"></select>
-        </div>
-        <div class="field-block" id="monthBlock">
-          <label class="field">Měsíc</label>
-          <select id="monthSelect"></select>
+  <div class="card">
+    <div class="row2">
+      <div class="field-block">
+        <span class="field">Měsíc</span>
+        <div class="mesic">
+          <button type="button" id="mesicPred" aria-label="Předchozí měsíc">‹</button>
+          <strong id="mesicNazev"></strong>
+          <button type="button" id="mesicDalsi" aria-label="Další měsíc">›</button>
         </div>
       </div>
-      <div class="field-block" style="margin-top:1rem;">
-        <label class="field">Kolik musíš odpracovat denně?</label>
-        <div class="row2">
-          <div>
-            <label class="field" for="targetHoursH">Hodiny</label>
-            <input type="number" id="targetHoursH" step="1" min="0" max="23">
-          </div>
-          <div>
-            <label class="field" for="targetHoursM">Minuty</label>
-            <input type="number" id="targetHoursM" step="1" min="0" max="59">
-          </div>
-        </div>
+      <div class="field-block hidden" id="employeeBlock">
+        <label class="field" for="employeeSelect">Zaměstnanec</label>
+        <select id="employeeSelect"></select>
       </div>
     </div>
+  </div>
 
-    <div class="card holidays">
-      <h2>Svátky v tomto měsíci</h2>
-      <div id="czechHolidays"></div>
-      <div id="jewishHolidays" style="margin-top:.75rem;"></div>
-      <div id="noHolidays" class="muted hidden">V tomto měsíci nevychází žádný svátek (ani český, ani žádný z hebrejského kalendáře).</div>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" id="tab-prehled" aria-controls="panel-prehled">Přehled</button>
+    <button type="button" role="tab" id="tab-planovac" aria-controls="panel-planovac">Plánovač</button>
+  </div>
+
+  <section id="panel-prehled" role="tabpanel" aria-labelledby="tab-prehled">
+    <div id="prehledPrazdny" class="card muted">Pro tento měsíc není nahraný export. Přetáhni ho nahoru – přehled ukazuje skutečně odpracované hodiny.</div>
+    <div id="prehledObsah" class="hidden">
+      <div class="card">
+        <span class="field">Kolik musíš odpracovat denně?</span>
+        <div class="hm">
+          <input type="number" id="prehledNormaH" step="1" min="0" max="23" aria-label="Hodiny"> h
+          <input type="number" id="prehledNormaM" step="1" min="0" max="59" aria-label="Minuty"> min
+        </div>
+      </div>
+      <div class="card holidays">
+        <h2>Svátky v tomto měsíci</h2>
+        <div id="czechHolidays"></div>
+        <div id="noHolidays" class="muted hidden">V tomto měsíci nevychází žádný státní svátek.</div>
+      </div>
+      <div class="card">
+        <h2>Souhrn</h2>
+        <div id="dataSourceNote" class="muted" style="margin-bottom:.75rem;"></div>
+        <div id="incompleteWarn" class="warn-box hidden"></div>
+        <div class="stats">
+          <div class="stat"><div class="label">Pracovních dní v měsíci</div><div class="value" id="statWorkdays">–</div></div>
+          <div class="stat"><div class="label">Odpracováno</div><div class="value" id="statWorked">–</div></div>
+          <div class="stat"><div class="label">Zbývá odpracovat</div><div class="value" id="statRemaining">–</div></div>
+          <div class="stat"><div class="label">Denní průměr do konce měsíce</div><div class="value" id="statPerDay">–</div></div>
+        </div>
+        <div class="progress"><div id="progressBar" style="width:0%"></div></div>
+      </div>
+      <div class="card">
+        <h2>Dny v měsíci</h2>
+        <table>
+          <thead><tr><th>Datum</th><th>Den</th><th>Odpracováno</th><th>Stav</th></tr></thead>
+          <tbody id="dayTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-planovac" role="tabpanel" aria-labelledby="tab-planovac" class="hidden">
+    <div class="card">
+      <h2>Nastavení</h2>
+      <div class="grid-nastaveni">
+        <div>
+          <span class="field">Denní norma</span>
+          <div class="hm">
+            <input type="number" id="normaH" step="1" min="0" max="23" aria-label="Norma hodiny"> h
+            <input type="number" id="normaM" step="1" min="0" max="59" aria-label="Norma minuty"> min
+          </div>
+        </div>
+        <div>
+          <label class="field" for="prichodVychozi">Příchod (pro všechny dny)</label>
+          <input type="time" id="prichodVychozi">
+        </div>
+        <div>
+          <label class="field" for="pauzaMin">Pauza na oběd</label>
+          <div class="hm"><input type="number" id="pauzaMin" step="5" min="0" max="240"> min</div>
+        </div>
+        <div>
+          <span class="field">Cesta do práce</span>
+          <div class="hm">
+            <input type="checkbox" id="cestaTamZap" aria-label="Cesta do práce zapnutá">
+            <input type="number" id="cestaTamMin" step="5" min="0" max="240" aria-label="Cesta do práce minuty"> min
+          </div>
+        </div>
+        <div>
+          <span class="field">Cesta z práce</span>
+          <div class="hm">
+            <input type="checkbox" id="cestaZpetZap" aria-label="Cesta z práce zapnutá">
+            <input type="number" id="cestaZpetMin" step="5" min="0" max="240" aria-label="Cesta z práce minuty"> min
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="card">
       <h2>Souhrn</h2>
-      <div id="dataSourceNote" class="muted" style="margin-bottom:.75rem;"></div>
-      <div id="incompleteWarn" class="warn-box hidden"></div>
-      <div class="stats">
-        <div class="stat"><div class="label">Pracovních dní v měsíci</div><div class="value" id="statWorkdays">–</div></div>
-        <div class="stat"><div class="label">Odpracováno</div><div class="value" id="statWorked">–</div></div>
-        <div class="stat"><div class="label">Zbývá odpracovat</div><div class="value" id="statRemaining">–</div></div>
-        <div class="stat"><div class="label">Denní průměr do konce měsíce</div><div class="value" id="statPerDay">–</div></div>
+      <div id="pVarovani" class="warn-box hidden"></div>
+      <div class="stats stats3">
+        <div class="stat"><div class="label">Fond</div><div class="value" id="pFond">–</div></div>
+        <div class="stat"><div class="label">Odpracováno</div><div class="value" id="pOdpracovano">–</div></div>
+        <div class="stat"><div class="label">Dovolená</div><div class="value" id="pDovolena">–</div></div>
+        <div class="stat"><div class="label">Zbývá</div><div class="value" id="pZbyva">–</div></div>
+        <div class="stat"><div class="label">Na den</div><div class="value" id="pNaDen">–</div></div>
       </div>
-      <div class="progress"><div id="progressBar" style="width:0%"></div></div>
+      <div class="progress"><div id="pProgress" style="width:0%"></div></div>
     </div>
 
     <div class="card">
-      <h2>Dny v měsíci</h2>
-      <table>
-        <thead><tr><th>Datum</th><th>Den</th><th>Odpracováno</th><th>Stav</th></tr></thead>
-        <tbody id="dayTable"></tbody>
-      </table>
+      <h2>Kalendář</h2>
+      <div class="muted">Klik na den přepíná: pracuji → dovolená → náhradní volno.</div>
+      <div id="kalendar" class="kalendar"></div>
+      <div class="muted">✓ odpracováno · ◐ rozpracováno · ● pracuji · D dovolená · N náhradní volno</div>
     </div>
-  </div>
+
+    <div class="card">
+      <h2>Plán dnů</h2>
+      <div class="tabulka-obal">
+        <table class="plan">
+          <thead><tr><th>Datum</th><th>Den</th><th>Stav</th><th>Hodiny</th><th>Příchod</th><th>Pauza</th><th>Odchod</th></tr></thead>
+          <tbody id="planTabulka"></tbody>
+        </table>
+      </div>
+      <div class="akce">
+        <button type="button" id="icsBtn" class="primary">Stáhnout .ics</button>
+        <button type="button" id="resetBtn">Obnovit plán měsíce</button>
+      </div>
+      <p class="muted">Import: soubor přidej do samostatného kalendáře, třeba „Práce – plán“. Když plán změníš, tento kalendář smaž a importuj znovu – Apple Kalendář by jinak mohl vytvořit duplicity.</p>
+    </div>
+  </section>
 </div>
 
 <footer>Data se zpracovávají lokálně v prohlížeči, nic se nikam neodesílá.</footer>
 
-<script>
-'use strict';
-
-/* ---------------- ZIP + XML plumbing ---------------- */
-
-function readU16(b, o) { return b[o] | (b[o + 1] << 8); }
-function readU32(b, o) { return (b[o] | (b[o + 1] << 8) | (b[o + 2] << 16) | (b[o + 3] << 24)) >>> 0; }
-
-async function inflateRaw(bytes) {
-  const ds = new DecompressionStream('deflate-raw');
-  const stream = new Blob([bytes]).stream().pipeThrough(ds);
-  return new Uint8Array(await new Response(stream).arrayBuffer());
-}
-
-async function unzip(buf) {
-  let eocd = -1;
-  for (let i = buf.length - 22; i >= 0; i--) {
-    if (readU32(buf, i) === 0x06054b50) { eocd = i; break; }
-  }
-  if (eocd === -1) throw new Error('Nepodařilo se přečíst .xlsx (chybí konec ZIP archivu).');
-  const cdOffset = readU32(buf, eocd + 16);
-  const cdEntries = readU16(buf, eocd + 10);
-  const files = {};
-  let off = cdOffset;
-  for (let n = 0; n < cdEntries; n++) {
-    if (readU32(buf, off) !== 0x02014b50) throw new Error('Poškozený .xlsx soubor (neplatná ZIP struktura).');
-    const method = readU16(buf, off + 10);
-    const compSize = readU32(buf, off + 20);
-    const nameLen = readU16(buf, off + 28);
-    const extraLen = readU16(buf, off + 30);
-    const commentLen = readU16(buf, off + 32);
-    const localOff = readU32(buf, off + 42);
-    const name = new TextDecoder('utf-8').decode(buf.slice(off + 46, off + 46 + nameLen));
-    const lNameLen = readU16(buf, localOff + 26);
-    const lExtraLen = readU16(buf, localOff + 28);
-    const dataStart = localOff + 30 + lNameLen + lExtraLen;
-    const compData = buf.slice(dataStart, dataStart + compSize);
-    files[name] = method === 0 ? compData : await inflateRaw(compData);
-    off += 46 + nameLen + extraLen + commentLen;
-  }
-  return files;
-}
-
-function parseXml(text) {
-  return new DOMParser().parseFromString(text, 'application/xml');
-}
-
-function colLetters(ref) {
-  const m = /^([A-Z]+)\d+$/.exec(ref);
-  return m ? m[1] : null;
-}
-
-/* Different exporters bind the main SpreadsheetML schema to the default
-   namespace (<row>, <c>, <v>...) or to an explicit prefix (<x:row>, <x:c>,
-   <x:v>...). tagName-based DOM lookups only match one or the other, so all
-   traversal here goes through localName instead, which is prefix-agnostic. */
-function byLocalName(root, name) {
-  const out = [];
-  for (const el of root.getElementsByTagName('*')) if (el.localName === name) out.push(el);
-  return out;
-}
-function firstChildByLocalName(el, name) {
-  for (const c of el.children) if (c.localName === name) return c;
-  return null;
-}
-function firstDescendantChildByLocalName(root, parentName, childName) {
-  for (const p of byLocalName(root, parentName)) {
-    const c = firstChildByLocalName(p, childName);
-    if (c) return c;
-  }
-  return null;
-}
-
-/* OOXML escapes otherwise-unsafe characters in string content as _xHHHH_
-   (e.g. a space becomes "_x0020_"); some exporters apply this liberally. */
-function decodeOoxmlEscapes(s) {
-  if (s == null) return s;
-  return s.replace(/_x([0-9A-Fa-f]{4})_/g, (m, hex) => String.fromCharCode(parseInt(hex, 16)));
-}
-
-function getCellRaw(cellEl) {
-  if (!cellEl) return null;
-  const t = cellEl.getAttribute('t') || 'n';
-  if (t === 'inlineStr') {
-    const tEl = firstDescendantChildByLocalName(cellEl, 'is', 't');
-    return tEl ? { type: 'str', value: decodeOoxmlEscapes(tEl.textContent) } : null;
-  }
-  const vEl = firstChildByLocalName(cellEl, 'v');
-  if (!vEl || vEl.textContent === '') return null;
-  return { type: t, value: decodeOoxmlEscapes(vEl.textContent) };
-}
-
-function resolveString(raw, sharedStrings) {
-  if (!raw) return null;
-  if (raw.type === 's') return sharedStrings[parseInt(raw.value, 10)] ?? null;
-  return raw.value;
-}
-
-/* duration text like "PT7H53M0.000S" -> minutes since midnight */
-function parseDurationToMinutes(v) {
-  const m = /^PT(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)M)?(?:(\d+(?:\.\d+)?)S)?$/.exec(v);
-  if (!m) return null;
-  const h = parseFloat(m[1] || 0), mi = parseFloat(m[2] || 0), s = parseFloat(m[3] || 0);
-  return h * 60 + mi + s / 60;
-}
-
-/* "HH:MM" or "-HH:MM" text -> minutes */
-function parseClockText(v) {
-  const m = /^(-?)(\d+):(\d{2})$/.exec((v || '').trim());
-  if (!m) return null;
-  const sign = m[1] === '-' ? -1 : 1;
-  return sign * (parseInt(m[2], 10) * 60 + parseInt(m[3], 10));
-}
-
-/* resolve a raw cell to "minutes since midnight", trying every format this exporter is known to use */
-function toMinutesOfDay(raw, sharedStrings) {
-  if (!raw) return null;
-  if (raw.type === 'd') {
-    if (raw.value.startsWith('P')) return parseDurationToMinutes(raw.value);
-    return null; // it's actually a date, not a time
-  }
-  if (raw.type === 's') return parseClockText(sharedStrings[parseInt(raw.value, 10)]);
-  if (raw.type === 'str' || raw.type === 'inlineStr') return parseClockText(raw.value);
-  // plain numeric excel time serial (fraction of a day)
-  const num = parseFloat(raw.value);
-  if (!isNaN(num)) {
-    const frac = num - Math.floor(num);
-    return Math.round(frac * 24 * 60);
-  }
-  return null;
-}
-
-/* resolve a raw cell to an ISO date string "YYYY-MM-DD" */
-const EXCEL_EPOCH = Date.UTC(1899, 11, 30);
-function toDateISO(raw) {
-  if (!raw) return null;
-  if (raw.type === 'd' && /^\d{4}-\d{2}-\d{2}/.test(raw.value)) return raw.value.slice(0, 10);
-  const num = parseFloat(raw.value);
-  if (!isNaN(num)) {
-    const ms = EXCEL_EPOCH + Math.round(num) * 86400000;
-    return new Date(ms).toISOString().slice(0, 10);
-  }
-  return null;
-}
-
-/* ---------------- workbook parsing ---------------- */
-
-async function parseWorkbook(arrayBuffer) {
-  const files = await unzip(new Uint8Array(arrayBuffer));
-  const dec = new TextDecoder('utf-8');
-
-  // resolve first worksheet path via workbook.xml + rels (robust to different export layouts)
-  let sheetPath = 'xl/worksheets/sheet1.xml';
-  try {
-    const wbXml = parseXml(dec.decode(files['xl/workbook.xml']));
-    const firstSheet = firstDescendantChildByLocalName(wbXml, 'sheets', 'sheet');
-    const rId = firstSheet && firstSheet.getAttribute('r:id');
-    const relsXml = parseXml(dec.decode(files['xl/_rels/workbook.xml.rels']));
-    const rel = byLocalName(relsXml, 'Relationship').find(r => r.getAttribute('Id') === rId);
-    if (rel) sheetPath = 'xl/' + rel.getAttribute('Target').replace(/^\/?/, '');
-  } catch (e) { /* fall back to default path */ }
-
-  const sharedStrings = [];
-  if (files['xl/sharedStrings.xml']) {
-    const ssXml = parseXml(dec.decode(files['xl/sharedStrings.xml']));
-    for (const si of byLocalName(ssXml, 'si')) {
-      const runs = byLocalName(si, 't');
-      sharedStrings.push(decodeOoxmlEscapes(runs.map(t => t.textContent).join('')));
-    }
-  }
-
-  if (!files[sheetPath]) throw new Error('V souboru nenacházím list s daty (' + sheetPath + ').');
-  const sheetXml = parseXml(dec.decode(files[sheetPath]));
-  const rowEls = byLocalName(sheetXml, 'row');
-  if (!rowEls.length) throw new Error('List je prázdný.');
-
-  // find header row: first row containing a cell resolving to "Date"
-  let headerRow = null, headerMap = {};
-  for (const rowEl of rowEls.slice(0, 5)) {
-    const map = {};
-    for (const c of byLocalName(rowEl, 'c')) {
-      const col = colLetters(c.getAttribute('r'));
-      const raw = getCellRaw(c);
-      const text = resolveString(raw, sharedStrings);
-      if (col && text != null) map[col] = text.trim();
-    }
-    if (Object.values(map).some(v => v.toLowerCase() === 'date')) { headerRow = rowEl; headerMap = map; break; }
-  }
-  if (!headerRow) throw new Error('Nenašel jsem hlavičkový řádek se sloupcem "Date".');
-
-  const nameToCol = {};
-  for (const [col, name] of Object.entries(headerMap)) nameToCol[name] = col;
-  const dateCol = nameToCol['Date'];
-  const employeeCol = nameToCol['Employee'];
-  if (!dateCol) throw new Error('Nenašel jsem sloupec "Date".');
-
-  const shiftPairs = [];
-  for (let n = 1; n <= 20; n++) {
-    const inCol = nameToCol['In ' + n], outCol = nameToCol['Out ' + n];
-    if (inCol && outCol) shiftPairs.push([inCol, outCol]);
-  }
-  if (!shiftPairs.length) throw new Error('Nenašel jsem žádné sloupce "In N" / "Out N".');
-  const totalWageCol = nameToCol['Total Wage'];
-
-  const headerRowNum = parseInt(headerRow.getAttribute('r'), 10);
-  const rows = [];
-  for (const rowEl of rowEls) {
-    if (parseInt(rowEl.getAttribute('r'), 10) === headerRowNum) continue;
-    const cells = {};
-    for (const c of byLocalName(rowEl, 'c')) {
-      const col = colLetters(c.getAttribute('r'));
-      if (col) cells[col] = getCellRaw(c);
-    }
-    const dateISO = toDateISO(cells[dateCol]);
-    if (!dateISO) continue;
-    const employee = employeeCol ? resolveString(cells[employeeCol], sharedStrings) : null;
-
-    let workedMinutes = 0, isOpen = false, hasAnyShift = false;
-    for (const [inCol, outCol] of shiftPairs) {
-      const inMin = toMinutesOfDay(cells[inCol], sharedStrings);
-      const outMin = toMinutesOfDay(cells[outCol], sharedStrings);
-      if (inMin != null) hasAnyShift = true;
-      if (inMin != null && outMin != null) {
-        let diff = outMin - inMin;
-        if (diff < 0) diff += 24 * 60;
-        workedMinutes += diff;
-      } else if (inMin != null && outMin == null) {
-        isOpen = true;
-      }
-    }
-
-    // prefer the exporter's own "Total Wage" column (includes paid absences) for
-    // finished days; a day that's still open hasn't been totalled by the exporter
-    // yet, so keep the live in/out sum for that one.
-    if (totalWageCol && !isOpen) {
-      const twMin = toMinutesOfDay(cells[totalWageCol], sharedStrings);
-      if (twMin != null) workedMinutes = twMin;
-    }
-
-    rows.push({ dateISO, employee, workedMinutes, isOpen, hasAnyShift });
-  }
-  rows.sort((a, b) => a.dateISO.localeCompare(b.dateISO));
-  rows.usedTotalWage = Boolean(totalWageCol);
-  return rows;
-}
-
-/* ---------------- Czech holidays ---------------- */
-
-function toISO(date) { return date.toISOString().slice(0, 10); }
-function dISO(y, m0, d) { return toISO(new Date(Date.UTC(y, m0, d))); }
-
-function easterSundayUTC(year) {
-  const a = year % 19, b = Math.floor(year / 100), c = year % 100;
-  const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
-  const g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
-  const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
-  const m = Math.floor((a + 11 * h + 22 * l) / 451);
-  const month = Math.floor((h + l - 7 * m + 114) / 31);
-  const day = ((h + l - 7 * m + 114) % 31) + 1;
-  return new Date(Date.UTC(year, month - 1, day));
-}
-
-function czechHolidays(year) {
-  const easter = easterSundayUTC(year);
-  const goodFriday = new Date(easter); goodFriday.setUTCDate(easter.getUTCDate() - 2);
-  const easterMonday = new Date(easter); easterMonday.setUTCDate(easter.getUTCDate() + 1);
-  return [
-    { date: dISO(year, 0, 1), name: 'Nový rok / Den obnovy samostatného českého státu' },
-    { date: toISO(goodFriday), name: 'Velký pátek' },
-    { date: toISO(easterMonday), name: 'Velikonoční pondělí' },
-    { date: dISO(year, 4, 1), name: 'Svátek práce' },
-    { date: dISO(year, 4, 8), name: 'Den vítězství' },
-    { date: dISO(year, 6, 5), name: 'Den slovanských věrozvěstů Cyrila a Metoděje' },
-    { date: dISO(year, 6, 6), name: 'Den upálení mistra Jana Husa' },
-    { date: dISO(year, 8, 28), name: 'Den české státnosti' },
-    { date: dISO(year, 9, 28), name: 'Den vzniku samostatného československého státu' },
-    { date: dISO(year, 10, 17), name: 'Den boje za svobodu a demokracii' },
-    { date: dISO(year, 11, 24), name: 'Štědrý den' },
-    { date: dISO(year, 11, 25), name: '1. svátek vánoční' },
-    { date: dISO(year, 11, 26), name: '2. svátek vánoční' },
-  ];
-}
-
-/* ---------------- Jewish holidays (via native Hebrew calendar, no hardcoded dates) ---------------- */
-
-const JEWISH_TABLE = [
-  { month: 'Tishri', day: 1, name: 'Roš ha-šana (1. den)', def: true },
-  { month: 'Tishri', day: 2, name: 'Roš ha-šana (2. den)', def: true },
-  { month: 'Tishri', day: 10, name: 'Jom kipur', def: true },
-  { month: 'Tishri', day: 15, name: 'Sukot (1. den)', def: true },
-  { month: 'Tishri', day: 21, name: 'Hošana raba', def: false },
-  { month: 'Tishri', day: 22, name: 'Šmini aceret / Simchat tora', def: true },
-  { month: 'Kislev', day: 25, name: 'Chanuka (1. den)', def: false },
-  { month: 'Adar', day: 14, name: 'Purim', def: false },
-  { month: 'Adar II', day: 14, name: 'Purim', def: false },
-  { month: 'Nisan', day: 15, name: 'Pesach (1. den)', def: true },
-  { month: 'Nisan', day: 21, name: 'Pesach (7. den)', def: true },
-  { month: 'Iyar', day: 5, name: 'Jom ha-acmaut (Den nezávislosti Izraele)*', def: false },
-  { month: 'Sivan', day: 6, name: 'Šavuot', def: true },
-  { month: 'Av', day: 9, name: 'Tiša be-av (půst)', def: false },
-];
-
-const hebrewFmtCache = new Intl.DateTimeFormat('en-u-ca-hebrew', { month: 'long', day: 'numeric' });
-
-function jewishHolidaysForGregorianYear(year) {
-  const out = [];
-  const d = new Date(Date.UTC(year, 0, 1));
-  const end = new Date(Date.UTC(year, 11, 31));
-  while (d <= end) {
-    const parts = hebrewFmtCache.formatToParts(d);
-    const map = Object.fromEntries(parts.map(p => [p.type, p.value]));
-    const hMonth = map.month, hDay = parseInt(map.day, 10);
-    for (const h of JEWISH_TABLE) {
-      if (h.month === hMonth && h.day === hDay) out.push({ date: toISO(d), name: h.name, def: h.def });
-    }
-    d.setUTCDate(d.getUTCDate() + 1);
-  }
-  return out;
-}
-
-/* ---------------- formatting helpers ---------------- */
-
-function fmtHM(min) {
-  const sign = min < 0 ? '-' : '';
-  min = Math.round(Math.abs(min));
-  return `${sign}${Math.floor(min / 60)}h ${String(min % 60).padStart(2, '0')}m`;
-}
-const WEEKDAYS_CZ = ['Ne', 'Po', 'Út', 'St', 'Čt', 'Pá', 'So'];
-const MONTHS_CZ = ['leden', 'únor', 'březen', 'duben', 'květen', 'červen', 'červenec', 'srpen', 'září', 'říjen', 'listopad', 'prosinec'];
-
-function daysInMonth(year, month0) { return new Date(Date.UTC(year, month0 + 1, 0)).getUTCDate(); }
-
-/* ---------------- app state & rendering ---------------- */
-
-const LS_TARGET_H = 'oc_target_h';
-const LS_TARGET_M = 'oc_target_m';
-const LS_JEWISH_PREFIX = 'oc_jewish_';
-const DEFAULT_TARGET_H = 6;
-const DEFAULT_TARGET_M = 24;
-
-let allRows = [];
-let usedTotalWage = false;
-let jewishPrefFor = {}; // name -> bool, populated per render
-
-function el(id) { return document.getElementById(id); }
-
-function populateSelectors() {
-  const employees = [...new Set(allRows.map(r => r.employee).filter(Boolean))];
-  const empSelect = el('employeeSelect');
-  empSelect.innerHTML = '';
-  if (employees.length <= 1) {
-    el('employeeBlock').classList.add('hidden');
-  } else {
-    el('employeeBlock').classList.remove('hidden');
-    for (const e of employees) {
-      const opt = document.createElement('option'); opt.value = e; opt.textContent = e;
-      empSelect.appendChild(opt);
-    }
-  }
-  const currentEmployee = employees.length ? (empSelect.value || employees[0]) : null;
-  if (currentEmployee) empSelect.value = currentEmployee;
-
-  const rowsForEmp = employees.length ? allRows.filter(r => r.employee === currentEmployee) : allRows;
-  const months = [...new Set(rowsForEmp.map(r => r.dateISO.slice(0, 7)))].sort();
-  const monthSelect = el('monthSelect');
-  monthSelect.innerHTML = '';
-  for (const m of months) {
-    const [y, mo] = m.split('-').map(Number);
-    const opt = document.createElement('option'); opt.value = m; opt.textContent = `${MONTHS_CZ[mo - 1]} ${y}`;
-    monthSelect.appendChild(opt);
-  }
-  if (months.length <= 1) el('monthBlock').classList.add('hidden'); else el('monthBlock').classList.remove('hidden');
-  if (months.length) monthSelect.value = months[months.length - 1];
-}
-
-function currentSelection() {
-  const employees = [...new Set(allRows.map(r => r.employee).filter(Boolean))];
-  const employee = employees.length ? (el('employeeSelect').value || employees[0]) : null;
-  const monthVal = el('monthSelect').value;
-  const [year, month1] = monthVal.split('-').map(Number);
-  return { employee, year, month0: month1 - 1 };
-}
-
-function render() {
-  if (!allRows.length) return;
-  const { employee, year, month0 } = currentSelection();
-  const rowsForMonth = allRows.filter(r =>
-    (employee ? r.employee === employee : true) &&
-    r.dateISO.slice(0, 7) === `${year}-${String(month0 + 1).padStart(2, '0')}`
-  );
-  const byDate = Object.fromEntries(rowsForMonth.map(r => [r.dateISO, r]));
-
-  const czech = czechHolidays(year).filter(h => h.date.slice(0, 7) === `${year}-${String(month0 + 1).padStart(2, '0')}`);
-  const jewishAll = jewishHolidaysForGregorianYear(year).filter(h => h.date.slice(0, 7) === `${year}-${String(month0 + 1).padStart(2, '0')}`);
-
-  // render holiday lists
-  const czechBox = el('czechHolidays');
-  czechBox.innerHTML = czech.length
-    ? `<div class="muted" style="margin-bottom:.3rem;">České státní svátky (odečítají se automaticky):</div><ul>${czech.map(h => `<li>${h.date.slice(8)}. – ${h.name}</li>`).join('')}</ul>`
-    : '';
-
-  const jewishBox = el('jewishHolidays');
-  if (jewishAll.length) {
-    jewishBox.innerHTML = `<div class="muted" style="margin-bottom:.3rem;">Svátky z hebrejského kalendáře (zaškrtni, pokud se u vás nepracuje):</div>` +
-      `<ul>${jewishAll.map(h => {
-        const key = LS_JEWISH_PREFIX + h.name;
-        const stored = localStorage.getItem(key);
-        const checked = stored !== null ? stored === '1' : h.def;
-        return `<li><label><input type="checkbox" data-name="${encodeURIComponent(h.name)}" class="jewishCb" ${checked ? 'checked' : ''}> ${h.date.slice(8)}. – ${h.name}</label></li>`;
-      }).join('')}</ul>` +
-      (jewishAll.some(h => h.name.includes('*')) ? `<div class="muted" style="margin-top:.3rem;">* Datum se v Izraeli může posouvat kvůli šabatu, ověř prosím oficiální zdroj.</div>` : '');
-    jewishBox.querySelectorAll('.jewishCb').forEach(cb => {
-      cb.addEventListener('change', () => {
-        localStorage.setItem(LS_JEWISH_PREFIX + decodeURIComponent(cb.dataset.name), cb.checked ? '1' : '0');
-        render();
-      });
-    });
-  } else {
-    jewishBox.innerHTML = '';
-  }
-  el('noHolidays').classList.toggle('hidden', czech.length + jewishAll.length > 0);
-
-  const excludedDates = new Set(czech.map(h => h.date));
-  for (const h of jewishAll) {
-    const stored = localStorage.getItem(LS_JEWISH_PREFIX + h.name);
-    const checked = stored !== null ? stored === '1' : h.def;
-    if (checked) excludedDates.add(h.date);
-  }
-
-  // build full month day list
-  const totalDays = daysInMonth(year, month0);
-  const dayList = [];
-  for (let d = 1; d <= totalDays; d++) {
-    const date = new Date(Date.UTC(year, month0, d));
-    const iso = toISO(date);
-    const dow = date.getUTCDay();
-    const isWeekend = dow === 0 || dow === 6;
-    const isHoliday = excludedDates.has(iso);
-    const isWorkday = !isWeekend && !isHoliday;
-    dayList.push({ iso, dow, isWorkday, record: byDate[iso] || null });
-  }
-
-  const workdays = dayList.filter(d => d.isWorkday);
-  const workdaysCount = workdays.length;
-
-  let workedMinutes = 0;
-  for (const d of workdays) if (d.record) workedMinutes += d.record.workedMinutes;
-
-  // cutoff = last date with any record in this month (defines "so far" vs "remaining")
-  const recordedDates = rowsForMonth.map(r => r.dateISO).sort();
-  const cutoff = recordedDates.length ? recordedDates[recordedDates.length - 1] : null;
-  const cutoffRecord = cutoff ? byDate[cutoff] : null;
-  const cutoffOpen = cutoffRecord ? cutoffRecord.isOpen : false;
-
-  let remainingWorkdays = 0;
-  for (const d of workdays) {
-    if (!cutoff || d.iso > cutoff) remainingWorkdays++;
-    else if (d.iso === cutoff && cutoffOpen) remainingWorkdays++;
-  }
-
-  const targetH = parseFloat(el('targetHoursH').value) || 0;
-  const targetM = parseFloat(el('targetHoursM').value) || 0;
-  const targetMinutesPerDay = targetH * 60 + targetM;
-  const targetTotalMinutes = workdaysCount * targetMinutesPerDay;
-  const remainingMinutes = targetTotalMinutes - workedMinutes;
-
-  el('dataSourceNote').textContent = usedTotalWage
-    ? 'Odpracované hodiny se počítají ze sloupce "Total Wage" (zahrnuje i placené absence); rozpracovaný den se dopočítává živě z In/Out.'
-    : 'Soubor neobsahuje sloupec "Total Wage" — odpracované hodiny se počítají z rozdílu In/Out.';
-
-  el('statWorkdays').textContent = workdaysCount;
-  el('statWorked').textContent = fmtHM(workedMinutes);
-  const remEl = el('statRemaining');
-  remEl.textContent = remainingMinutes > 0 ? fmtHM(remainingMinutes) : ('splněno, +' + fmtHM(-remainingMinutes));
-  remEl.className = 'value ' + (remainingMinutes > 0 ? '' : 'ok');
-
-  const perDayEl = el('statPerDay');
-  const warnBox = el('incompleteWarn');
-  if (remainingMinutes <= 0) {
-    perDayEl.textContent = '–';
-    perDayEl.className = 'value';
-    warnBox.classList.add('hidden');
-  } else if (remainingWorkdays <= 0) {
-    perDayEl.textContent = '–';
-    perDayEl.className = 'value bad';
-    warnBox.textContent = 'V měsíci už nezbývá dost pracovních dní na dosažení normy podle aktuálních dat.';
-    warnBox.classList.remove('hidden');
-  } else {
-    perDayEl.textContent = fmtHM(remainingMinutes / remainingWorkdays);
-    perDayEl.className = 'value';
-    warnBox.classList.add('hidden');
-  }
-
-  const progressPct = targetTotalMinutes > 0 ? Math.min(100, Math.max(0, (workedMinutes / targetTotalMinutes) * 100)) : 0;
-  el('progressBar').style.width = progressPct + '%';
-
-  // table
-  const tbody = el('dayTable');
-  tbody.innerHTML = '';
-  for (const d of dayList) {
-    if (!d.isWorkday && !d.record) continue; // skip plain weekends/holidays with nothing to show
-    const tr = document.createElement('tr');
-    if (d.iso === cutoff) tr.classList.add('today');
-    const dateLabel = `${d.iso.slice(8)}.${d.iso.slice(5, 7)}.`;
-    let statusHtml, workedLabel;
-    if (!d.isWorkday) {
-      statusHtml = '<span class="tag missing">svátek</span>';
-      workedLabel = d.record ? fmtHM(d.record.workedMinutes) : '–';
-    } else if (!d.record) {
-      statusHtml = '<span class="tag missing">bez záznamu</span>';
-      workedLabel = '–';
-    } else if (d.record.isOpen) {
-      statusHtml = '<span class="tag open">v průběhu</span>';
-      workedLabel = fmtHM(d.record.workedMinutes);
-    } else {
-      statusHtml = '<span class="tag ok">hotovo</span>';
-      workedLabel = fmtHM(d.record.workedMinutes);
-    }
-    tr.innerHTML = `<td>${dateLabel}</td><td>${WEEKDAYS_CZ[d.dow]}</td><td>${workedLabel}</td><td>${statusHtml}</td>`;
-    tbody.appendChild(tr);
-  }
-}
-
-/* ---------------- file handling ---------------- */
-
-async function handleFile(file) {
-  el('fileError').classList.add('hidden');
-  try {
-    const buf = await file.arrayBuffer();
-    allRows = await parseWorkbook(buf);
-    if (!allRows.length) throw new Error('V souboru jsem nenašel žádné řádky s daty.');
-    usedTotalWage = allRows.usedTotalWage;
-    el('app').classList.remove('hidden');
-    populateSelectors();
-    render();
-  } catch (err) {
-    console.error(err);
-    el('fileError').textContent = 'Nepodařilo se zpracovat soubor: ' + err.message;
-    el('fileError').classList.remove('hidden');
-    el('app').classList.add('hidden');
-  }
-}
-
-function init() {
-  if (typeof DecompressionStream === 'undefined' || typeof DOMParser === 'undefined') {
-    el('fileError').textContent = 'Tvůj prohlížeč nepodporuje potřebné funkce. Zkus aktuální verzi Chrome, Edge, Firefox nebo Safari.';
-    el('fileError').classList.remove('hidden');
-    return;
-  }
-  const drop = el('drop'), fileInput = el('fileInput');
-  drop.addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
-  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag'); });
-  drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
-  drop.addEventListener('drop', e => {
-    e.preventDefault(); drop.classList.remove('drag');
-    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-  });
-
-  const targetHInput = el('targetHoursH'), targetMInput = el('targetHoursM');
-  const savedH = localStorage.getItem(LS_TARGET_H);
-  const savedM = localStorage.getItem(LS_TARGET_M);
-  targetHInput.value = savedH !== null ? savedH : DEFAULT_TARGET_H;
-  targetMInput.value = savedM !== null ? savedM : DEFAULT_TARGET_M;
-  const saveTarget = () => {
-    localStorage.setItem(LS_TARGET_H, targetHInput.value);
-    localStorage.setItem(LS_TARGET_M, targetMInput.value);
-    render();
-  };
-  targetHInput.addEventListener('input', saveTarget);
-  targetMInput.addEventListener('input', saveTarget);
-
-  el('employeeSelect').addEventListener('change', () => { populateSelectors(); render(); });
-  el('monthSelect').addEventListener('change', render);
-}
-
-init();
-</script>
+<script src="kalendar.js"></script>
+<script src="xlsx.js"></script>
+<script src="planovac.js"></script>
+<script src="ics.js"></script>
+<script src="ulozeni.js"></script>
+<script src="prehled.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
