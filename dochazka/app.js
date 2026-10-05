@@ -40,6 +40,48 @@
   }
   function datumText(iso) { return `${Number(iso.slice(8))}. ${Number(iso.slice(5, 7))}.`; }
 
+  // Pole času ve 24h tvaru HH:MM s tlačítky −/+ a šipkami nahoru/dolů po 15 minutách.
+  const KROK_CASU = 15;
+  function napojCasovePole(pole, minus, plus, ziskej, uloz) {
+    const nastav = v => { pole.value = K.fmtTimeInput(v); uloz(v); };
+    pole.addEventListener('change', () => {
+      const v = K.parseCasDne(pole.value);
+      if (v == null) pole.value = K.fmtTimeInput(ziskej());
+      else if (v !== ziskej()) nastav(v);
+    });
+    pole.addEventListener('keydown', e => {
+      if (e.key === 'Enter') pole.blur();
+      if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+      e.preventDefault();
+      const zaklad = K.parseCasDne(pole.value) ?? ziskej();
+      nastav(K.posunCas(zaklad, e.key === 'ArrowUp' ? KROK_CASU : -KROK_CASU));
+    });
+    minus.addEventListener('click', () => nastav(K.posunCas(ziskej(), -KROK_CASU)));
+    plus.addEventListener('click', () => nastav(K.posunCas(ziskej(), KROK_CASU)));
+  }
+  function casovePole(hodnota, popis, uloz) {
+    const obal = document.createElement('span');
+    obal.className = 'cas-obal';
+    const minus = document.createElement('button');
+    const plus = document.createElement('button');
+    const pole = document.createElement('input');
+    minus.type = plus.type = 'button';
+    minus.className = plus.className = 'krok';
+    minus.textContent = '−';
+    plus.textContent = '+';
+    minus.setAttribute('aria-label', popis + ' o 15 min dříve');
+    plus.setAttribute('aria-label', popis + ' o 15 min později');
+    pole.type = 'text';
+    pole.className = 'cas';
+    pole.maxLength = 5;
+    pole.placeholder = 'HH:MM';
+    pole.value = K.fmtTimeInput(hodnota);
+    pole.setAttribute('aria-label', popis);
+    obal.append(minus, pole, plus);
+    napojCasovePole(pole, minus, plus, () => hodnota, uloz);
+    return obal;
+  }
+
   function zmenUpravu(iso, zmena) {
     const u = upravy();
     const den = { ...(u[iso] || {}), ...zmena };
@@ -99,6 +141,9 @@
     setVal('cestaTamMin', n.cestaTamMin);
     el('cestaZpetZap').checked = n.cestaZpetZap;
     setVal('cestaZpetMin', n.cestaZpetMin);
+    setVal('gymMin', n.gymMin);
+    setVal('cestaGymTamMin', n.cestaGymTamMin);
+    setVal('cestaGymZpetMin', n.cestaGymZpetMin);
 
     const { dny, souhrn } = spocitej();
     renderSouhrn(souhrn);
@@ -165,7 +210,7 @@
         tr.className = 'jen-cteni';
         tr.appendChild(td(d.druh === 'export' ? 'hotovo' : 'bez záznamu'));
         tr.appendChild(td(d.druh === 'export' ? K.fmtClock(d.hodinyMin) : '–'));
-        for (let i = 0; i < 3; i++) tr.appendChild(td('–'));
+        for (let i = 0; i < 4; i++) tr.appendChild(td('–'));
         tb.appendChild(tr);
         continue;
       }
@@ -180,7 +225,7 @@
       tr.appendChild(td(sel));
 
       if (d.stav !== 'prace') {
-        for (let i = 0; i < 4; i++) tr.appendChild(td('–'));
+        for (let i = 0; i < 5; i++) tr.appendChild(td('–'));
         tb.appendChild(tr);
         continue;
       }
@@ -206,18 +251,7 @@
       }
       tr.appendChild(bunka);
 
-      const pr = document.createElement('input');
-      pr.type = 'time';
-      pr.value = K.fmtTimeInput(d.prichodMin);
-      pr.setAttribute('aria-label', 'Příchod ' + datumText(d.iso));
-      // ukládá se až při opuštění pole – prohlížeče hlásí change už během psaní
-      pr.addEventListener('blur', () => {
-        const v = K.parseClock(pr.value);
-        if (v == null) renderSFokusem();
-        else if (v !== d.prichodMin) zmenUpravu(d.iso, { prichodMin: v });
-      });
-      pr.addEventListener('keydown', e => { if (e.key === 'Enter') pr.blur(); });
-      tr.appendChild(td(pr));
+      tr.appendChild(td(casovePole(d.prichodMin, 'Příchod ' + datumText(d.iso), v => zmenUpravu(d.iso, { prichodMin: v }))));
 
       const pa = document.createElement('input');
       pa.type = 'checkbox';
@@ -225,6 +259,13 @@
       pa.setAttribute('aria-label', 'Pauza ' + datumText(d.iso));
       pa.addEventListener('change', () => zmenUpravu(d.iso, { pauza: pa.checked ? undefined : false }));
       tr.appendChild(td(pa));
+
+      const gym = document.createElement('input');
+      gym.type = 'checkbox';
+      gym.checked = d.gym;
+      gym.setAttribute('aria-label', 'Gym ' + datumText(d.iso));
+      gym.addEventListener('change', () => zmenUpravu(d.iso, { gym: gym.checked ? true : undefined }));
+      tr.appendChild(td(gym));
 
       tr.appendChild(td(d.odchodMin != null ? K.fmtTimeInput(d.odchodMin) : '–'));
       tb.appendChild(tr);
@@ -245,7 +286,9 @@
     const pauza = cislo('pauzaMin', 0, 240); if (pauza != null) n.pauzaMin = pauza;
     const tam = cislo('cestaTamMin', 0, 240); if (tam != null) n.cestaTamMin = tam;
     const zpet = cislo('cestaZpetMin', 0, 240); if (zpet != null) n.cestaZpetMin = zpet;
-    const prichod = K.parseClock(el('prichodVychozi').value); if (prichod != null) n.prichodMin = prichod;
+    const gymMin = cislo('gymMin', 0, 480); if (gymMin != null) n.gymMin = gymMin;
+    const gymTam = cislo('cestaGymTamMin', 0, 240); if (gymTam != null) n.cestaGymTamMin = gymTam;
+    const gymZpet = cislo('cestaGymZpetMin', 0, 240); if (gymZpet != null) n.cestaGymZpetMin = gymZpet;
     n.cestaTamZap = el('cestaTamZap').checked;
     n.cestaZpetZap = el('cestaZpetZap').checked;
     ul.ulozNastaveni(n);
@@ -341,8 +384,13 @@
     el('tab-prehled').addEventListener('click', () => zvolZalozku('prehled'));
     el('tab-planovac').addEventListener('click', () => zvolZalozku('planovac'));
 
-    for (const id of ['normaH', 'normaM', 'pauzaMin', 'cestaTamMin', 'cestaZpetMin']) el(id).addEventListener('input', zmenNastaveni);
-    for (const id of ['prichodVychozi', 'cestaTamZap', 'cestaZpetZap']) el(id).addEventListener('change', zmenNastaveni);
+    for (const id of ['normaH', 'normaM', 'pauzaMin', 'cestaTamMin', 'cestaZpetMin', 'gymMin', 'cestaGymTamMin', 'cestaGymZpetMin']) el(id).addEventListener('input', zmenNastaveni);
+    for (const id of ['cestaTamZap', 'cestaZpetZap']) el(id).addEventListener('change', zmenNastaveni);
+    napojCasovePole(el('prichodVychozi'), el('prichodMinus'), el('prichodPlus'), () => stav.nastaveni.prichodMin, v => {
+      stav.nastaveni.prichodMin = v;
+      ul.ulozNastaveni(stav.nastaveni);
+      render();
+    });
     for (const id of ['prehledNormaH', 'prehledNormaM']) el(id).addEventListener('input', zmenNormuPrehledu);
 
     el('icsBtn').addEventListener('click', stahniIcs);

@@ -25,7 +25,7 @@
     for (const d of K.monthDays(rok, mesic0)) {
       const z = recs.get(d.iso) || null;
       const den = { iso: d.iso, dow: d.dow, druh: null, svatek: d.holiday, stav: null, hodinyMin: null,
-        zamceno: false, prichodMin: null, pauza: false, odchodMin: null, rozpracovany: false };
+        zamceno: false, prichodMin: null, pauza: false, gym: false, odchodMin: null, rozpracovany: false };
       if (!d.isWorkday) {
         den.druh = d.isWeekend ? 'vikend' : 'svatek';
         if (z && d.iso !== otevreny) den.hodinyMin = z.workedMinutes;
@@ -42,6 +42,7 @@
           den.stav = VOLNO.includes(u.stav) ? u.stav : 'prace';
           if (den.stav === 'prace') {
             den.pauza = u.pauza !== false;
+            den.gym = u.gym === true;
             den.prichodMin = Number.isFinite(u.prichodMin) ? u.prichodMin
               : (den.rozpracovany && z && Number.isFinite(z.firstInMin) ? z.firstInMin : nastaveni.prichodMin);
             if (Number.isFinite(u.hodinyMin) && u.hodinyMin >= 0) {

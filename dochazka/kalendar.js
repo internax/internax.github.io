@@ -86,8 +86,19 @@
     return parseInt(m[1], 10) * 60 + minutes;
   }
 
+  // čas dne ve 24h tvaru: 0:00–23:59, jinak null
+  function parseCasDne(text) {
+    const m = parseClock(text);
+    return m != null && m < 1440 ? m : null;
+  }
+  // posun času o krok (např. ±15 min); nahoru nejvýš na 23:45, dolů nejníž na 0:00
+  function posunCas(min, krok) {
+    const v = min + krok;
+    return krok > 0 ? Math.max(min, Math.min(1425, v)) : Math.max(0, v);
+  }
+
   const api = { WEEKDAYS_CZ, MONTHS_CZ, monthKey, addMonths, daysInMonth, czechHolidays, holidaysInMonth,
-    monthDays, fmtHM, fmtClock, fmtTimeInput, parseClock };
+    monthDays, fmtHM, fmtClock, fmtTimeInput, parseClock, parseCasDne, posunCas };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else (root.OC = root.OC || {}).kalendar = api;
 })(this);

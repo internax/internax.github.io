@@ -3,7 +3,8 @@
   'use strict';
 
   const VYCHOZI = Object.freeze({ normaMin: 384, prichodMin: 450, pauzaMin: 40,
-    cestaTamZap: true, cestaTamMin: 30, cestaZpetZap: true, cestaZpetMin: 30 });
+    cestaTamZap: true, cestaTamMin: 30, cestaZpetZap: true, cestaZpetMin: 30,
+    gymMin: 75, cestaGymTamMin: 20, cestaGymZpetMin: 15 });
   const KLIC_NASTAVENI = 'oc_nastaveni';
   const klicPlanu = mesic => 'oc_plan_' + mesic;
 

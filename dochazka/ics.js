@@ -45,7 +45,15 @@
       }
       radky.push(...udalost(uid('prace'), utc(d.iso, d.prichodMin), utc(d.iso, d.odchodMin),
         `Práce ${K.fmtClock(d.hodinyMin)}`, d.pauza ? `pauza ${nastaveni.pauzaMin} min` : '', dtstamp));
-      if (nastaveni.cestaZpetZap) {
+      if (d.gym) {
+        // gym nahrazuje cestu z práce: cesta do gymu → gym → cesta z gymu, události s nulovou délkou se vynechají
+        let cas = d.odchodMin;
+        for (const [typ, nazev, delka] of [['gym-tam', 'Cesta do gymu', nastaveni.cestaGymTamMin],
+          ['gym', 'Gym', nastaveni.gymMin], ['gym-zpet', 'Cesta z gymu', nastaveni.cestaGymZpetMin]]) {
+          if (delka > 0) radky.push(...udalost(uid(typ), utc(d.iso, cas), utc(d.iso, cas + delka), nazev, '', dtstamp));
+          cas += delka;
+        }
+      } else if (nastaveni.cestaZpetZap) {
         radky.push(...udalost(uid('cesta-zpet'), utc(d.iso, d.odchodMin), utc(d.iso, d.odchodMin + nastaveni.cestaZpetMin),
           'Cesta z práce', '', dtstamp));
       }

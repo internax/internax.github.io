@@ -100,6 +100,9 @@
   table.plan td { white-space: nowrap; }
   table.plan select { width: auto; padding: .3rem .4rem; font-size: .88rem; }
   input.hodiny { width: 4.5rem; }
+  .cas-obal { display: inline-flex; align-items: center; gap: .25rem; }
+  input.cas { width: 4.2rem; text-align: center; }
+  button.krok { padding: .25rem .55rem; line-height: 1.2; }
   tr.jen-cteni td { color: var(--muted); }
   button.reset { margin-left: .3rem; padding: .2rem .45rem; font-size: .8rem; }
   .akce { display: flex; gap: .75rem; flex-wrap: wrap; justify-content: space-between; margin-top: 1rem; }
@@ -197,7 +200,11 @@
         </div>
         <div>
           <label class="field" for="prichodVychozi">Příchod (pro všechny dny)</label>
-          <input type="time" id="prichodVychozi">
+          <span class="cas-obal">
+            <button type="button" class="krok" id="prichodMinus" aria-label="Výchozí příchod o 15 min dříve">−</button>
+            <input type="text" class="cas" id="prichodVychozi" maxlength="5" placeholder="HH:MM">
+            <button type="button" class="krok" id="prichodPlus" aria-label="Výchozí příchod o 15 min později">+</button>
+          </span>
         </div>
         <div>
           <label class="field" for="pauzaMin">Pauza na oběd</label>
@@ -216,6 +223,18 @@
             <input type="checkbox" id="cestaZpetZap" aria-label="Cesta z práce zapnutá">
             <input type="number" id="cestaZpetMin" step="5" min="0" max="240" aria-label="Cesta z práce minuty"> min
           </div>
+        </div>
+        <div>
+          <label class="field" for="gymMin">Gym</label>
+          <div class="hm"><input type="number" id="gymMin" step="5" min="0" max="480"> min</div>
+        </div>
+        <div>
+          <label class="field" for="cestaGymTamMin">Cesta do gymu</label>
+          <div class="hm"><input type="number" id="cestaGymTamMin" step="5" min="0" max="240"> min</div>
+        </div>
+        <div>
+          <label class="field" for="cestaGymZpetMin">Cesta z gymu</label>
+          <div class="hm"><input type="number" id="cestaGymZpetMin" step="5" min="0" max="240"> min</div>
         </div>
       </div>
     </div>
@@ -244,7 +263,7 @@
       <h2>Plán dnů</h2>
       <div class="tabulka-obal">
         <table class="plan">
-          <thead><tr><th>Datum</th><th>Den</th><th>Stav</th><th>Hodiny</th><th>Příchod</th><th>Pauza</th><th>Odchod</th></tr></thead>
+          <thead><tr><th>Datum</th><th>Den</th><th>Stav</th><th>Hodiny</th><th>Příchod</th><th>Pauza</th><th>Gym</th><th>Odchod</th></tr></thead>
           <tbody id="planTabulka"></tbody>
         </table>
       </div>
