@@ -8,13 +8,23 @@
   const vyplnene = (n, hodnota) => Array.from({ length: n }, () => hodnota);
 
   /*
-   * cvik:     { rozsah_min, rozsah_max, krok_kg }
+   * cvik:     { rozsah_min, rozsah_max, krok_kg, doporucena_kg? }
    * pocetSerii: kolik sérií je dnes v plánu
    * posledni: poslední záznam cviku { vaha_kg, opakovani: [..], pocit } nebo null
    * → { vaha_kg, opakovani: [..pocetSerii], duvod }
-   *   duvod: 'bez-historie' | 'pridat' | 'zopakovat' | 'opakovani'
+   *   duvod: 'bez-historie' | 'pridat' | 'zopakovat' | 'opakovani' | 'kouc'
+   * Doporučení kouče (cvik.doporucena_kg) se použije, když je vyšší než vypočtená váha nebo váha chybí.
    */
   function dnesniCil(cvik, pocetSerii, posledni) {
+    const cil = cilZHistorie(cvik, pocetSerii, posledni);
+    const d = cvik.doporucena_kg == null ? null : Number(cvik.doporucena_kg);
+    if (d != null && (cil.vaha_kg == null || d > cil.vaha_kg)) {
+      return { vaha_kg: d, opakovani: vyplnene(pocetSerii, cvik.rozsah_min), duvod: 'kouc' };
+    }
+    return cil;
+  }
+
+  function cilZHistorie(cvik, pocetSerii, posledni) {
     const { rozsah_min: min, rozsah_max: max, krok_kg: krok } = cvik;
     const minule = posledni && Array.isArray(posledni.opakovani) ? posledni.opakovani : [];
     if (!posledni || !minule.length) {
@@ -22,8 +32,11 @@
     }
 
     const vaha = posledni.vaha_kg ?? null;
-    const vseNahore = minule.length >= pocetSerii && minule.slice(0, pocetSerii).every(o => o >= max);
-    if (vseNahore && posledni.pocit !== 'cervena') {
+    const plne = minule.length >= pocetSerii ? minule.slice(0, pocetSerii) : null;
+    const vseNahore = Boolean(plne) && plne.every(o => o >= max);
+    // zelená (3+ v zásobě) a aspoň spodní hranice ve všech sériích → váha je lehká, přidat hned
+    const zelenaVRozsahu = Boolean(plne) && posledni.pocit === 'zelena' && plne.every(o => o >= min);
+    if ((vseNahore && posledni.pocit !== 'cervena') || zelenaVRozsahu) {
       return { vaha_kg: vaha == null ? null : zaokrouhli(vaha + krok), opakovani: vyplnene(pocetSerii, min), duvod: 'pridat' };
     }
     if (vseNahore) return { vaha_kg: vaha, opakovani: vyplnene(pocetSerii, max), duvod: 'zopakovat' };

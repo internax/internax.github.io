@@ -267,12 +267,17 @@
 
       const minule = hist[0];
       const info = prvek('div', 'minule');
-      if (!minule) info.textContent = `Poprvé: zvol váhu, se kterou dáš ${c.rozsah_min}–${c.rozsah_max} opakování a pár ti zbyde.`;
+      if (!minule) {
+        info.textContent = cil.duvod === 'kouc'
+          ? `Poprvé: váha je doporučení kouče, cíl ${c.rozsah_min}–${c.rozsah_max} opakování.`
+          : `Poprvé: zvol váhu, se kterou dáš ${c.rozsah_min}–${c.rozsah_max} opakování a pár ti zbyde.`;
+      }
       else {
-        const duvod = { pridat: 'dnes přidej váhu', zopakovat: 'stejná váha ještě jednou', opakovani: 'zkus o opakování víc' }[cil.duvod];
+        const duvod = { pridat: 'dnes přidej váhu', zopakovat: 'stejná váha ještě jednou', opakovani: 'zkus o opakování víc',
+          kouc: `doporučení kouče ${kg(cil.vaha_kg)}` }[cil.duvod];
         info.append(`Minule: ${kg(minule.vaha_kg)} · ${minule.opakovani.join(' · ')} `);
         if (minule.pocit) info.append(tecka(minule.pocit));
-        if (duvod) info.append(prvek('span', 'duvod' + (cil.duvod === 'pridat' ? ' pridat' : ''), '→ ' + duvod));
+        if (duvod) info.append(prvek('span', 'duvod' + (cil.duvod === 'pridat' || cil.duvod === 'kouc' ? ' pridat' : ''), '→ ' + duvod));
       }
       karta.append(info);
       if (PG.dvakratCervena(hist)) {
@@ -303,6 +308,7 @@
         prvek('span', 'jednotka', 'kg'),
         tlacitko('+', 'krok', posun(1), `Přidat ${c.krok_kg} kg`));
       karta.append(vahaRadek);
+      if (c.vaha_popis) karta.append(prvek('div', 'muted vaha-popis', 'Váha = ' + c.vaha_popis));
 
       // série
       const serie = prvek('div', 'serie');
@@ -314,6 +320,12 @@
         serie.append(radek);
       });
       karta.append(serie);
+      // série navíc nebo méně, než je v plánu
+      const pocetSerii = prvek('div', 'pocet-serii');
+      pocetSerii.append(
+        tlacitko('− série', 'odkaz', () => { if (k.opakovani.length > 1) { k.opakovani.pop(); vykresli(); } }, 'Odebrat sérii'),
+        tlacitko('+ série', 'odkaz', () => { k.opakovani.push(k.opakovani[k.opakovani.length - 1] ?? c.rozsah_min); vykresli(); }, 'Přidat sérii'));
+      karta.append(pocetSerii);
 
       // rameno a poznámka
       const doplnky = prvek('div', 'doplnky');

@@ -48,11 +48,11 @@
     // plán obou variant i s cviky, v pořadí
     async function nactiPlan() {
       const radky = zkontroluj(await klient.from('plan')
-        .select('varianta, poradi, pocet_serii, cviky(id, nazev, rozsah_min, rozsah_max, krok_kg, poznamka)')
+        .select('varianta, poradi, pocet_serii, cviky(id, nazev, rozsah_min, rozsah_max, krok_kg, poznamka, doporucena_kg, vaha_popis)')
         .order('poradi', { ascending: true }));
       return radky.filter(r => r.cviky).map(r => ({
         varianta: r.varianta, poradi: r.poradi, pocet_serii: r.pocet_serii,
-        cvik: { ...r.cviky, krok_kg: Number(r.cviky.krok_kg) },
+        cvik: { ...r.cviky, krok_kg: Number(r.cviky.krok_kg), doporucena_kg: r.cviky.doporucena_kg == null ? null : Number(r.cviky.doporucena_kg) },
       }));
     }
     async function nactiPosledniTrenink() {
