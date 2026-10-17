@@ -25,6 +25,57 @@
     t.setAttribute('aria-label', POCIT[pocit].text);
     return t;
   }
+  // ikonka kopírování (SVG, žádné emoji)
+  const IKONA_KOPIROVAT = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>';
+
+  async function doSchranky(text) {
+    try { await navigator.clipboard.writeText(text); return true; } catch (e) { /* starší prohlížeč */ }
+    const pole = document.createElement('textarea');
+    pole.value = text;
+    pole.setAttribute('readonly', '');
+    pole.style.position = 'fixed';
+    pole.style.opacity = '0';
+    document.body.append(pole);
+    pole.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    pole.remove();
+    return ok;
+  }
+
+  // anglický název s tlačítkem na zkopírování (kvůli dohledání videí)
+  function anglickyNazev(text) {
+    const radek = prvek('div', 'nazev-en');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'kopirovat';
+    b.setAttribute('aria-label', 'Zkopírovat anglický název ' + text);
+    b.innerHTML = IKONA_KOPIROVAT;
+    const stav = prvek('span', 'zkopirovano');
+    b.addEventListener('click', async () => {
+      stav.textContent = await doSchranky(text) ? 'zkopírováno' : 'nejde kopírovat';
+      setTimeout(() => { stav.textContent = ''; }, 1500);
+    });
+    radek.append(prvek('span', null, text), b, stav);
+    return radek;
+  }
+
+  // popis rozdělený na odstavce podle nadpisů „K čemu:“, „Provedení:“ …
+  const NADPISY_POPISU = /(K čemu|Zahřátí|Nastavení|Provedení|Chyby|Pozor|Supersérie):\s*/g;
+  function jakNaTo(popis) {
+    const d = document.createElement('details');
+    d.className = 'jak-na-to';
+    d.append(prvek('summary', null, 'Jak na to'));
+    const casti = popis.split(NADPISY_POPISU);      // [úvod, nadpis, text, nadpis, text …]
+    if (casti[0].trim()) d.append(prvek('p', null, casti[0].trim()));
+    for (let i = 1; i < casti.length; i += 2) {
+      const p = prvek('p');
+      p.append(prvek('strong', null, casti[i] + ': '), casti[i + 1].trim());
+      d.append(p);
+    }
+    return d;
+  }
+
   function tlacitko(text, trida, fn, popisek) {
     const b = prvek('button', trida, text);
     b.type = 'button';
@@ -74,7 +125,7 @@
 
     function zacni(varianta) {
       hotovo = null;
-      r = { datum: P.mistniDatum(), varianta, trenink_id: null, zaznamy: {}, preskocene: [] };
+      r = { datum: P.mistniDatum(), varianta, trenink_id: null, zacatek: new Date().toISOString(), zaznamy: {}, preskocene: [] };
       ulozR();
       vykresli();
       root.scrollTo(0, 0);
@@ -109,6 +160,8 @@
       if (pridano.length) radky.push('Přidaná váha: ' + pridano.join(', '));
       const rekordy = ids.filter(id => S.jeRekord(r.zaznamy[id], historie[id] || [])).map(nazev);
       if (rekordy.length) radky.push('Nový rekord: ' + rekordy.join(', '));
+      const delka = S.delkaTreninku(r.zacatek, ids.map(id => r.zaznamy[id].potvrzeno));
+      if (delka != null) radky.push(`Trénink trval ${Math.round(delka)} min`);
       const pocet = ids.length;
       return { nadpis: `Trénink ${r.varianta} uložen – ${pocet} ${pocet === 1 ? 'cvik' : pocet < 5 ? 'cviky' : 'cviků'}. Dobrá práce!`, radky };
     }
@@ -149,7 +202,7 @@
       try {
         for (const id of U.neodeslane(r)) {
           if (r.trenink_id == null) {
-            r.trenink_id = await data.zalozTrenink(r.datum, r.varianta);
+            r.trenink_id = await data.zalozTrenink(r.datum, r.varianta, r.zacatek);
             ulozR();
           }
           await data.ulozZaznam(r.trenink_id, id, r.zaznamy[id]);
@@ -188,13 +241,14 @@
     function potvrd(polozka, pocit) {
       const id = String(polozka.cvik.id);
       const k = konceptPro(polozka);
-      // cíl se uloží při prvním potvrzení; úprava cviku ho nemění
+      // cíl a čas se uloží při prvním potvrzení; úprava cviku (poznámka, opakování) je nemění
+      const potvrzeno = (r.zaznamy[id] && r.zaznamy[id].potvrzeno) || new Date().toISOString();
       const cil = r.zaznamy[id] && r.zaznamy[id].cil_opakovani
         ? { vaha_kg: r.zaznamy[id].cil_vaha_kg, opakovani: r.zaznamy[id].cil_opakovani }
         : cilPro(polozka);
       r.zaznamy[id] = {
         vaha_kg: k.vaha, opakovani: [...k.opakovani], pocit, rameno: k.rameno, poznamka: k.poznamka.trim(),
-        cil_vaha_kg: cil.vaha_kg, cil_opakovani: [...cil.opakovani], odeslano: false,
+        cil_vaha_kg: cil.vaha_kg, cil_opakovani: [...cil.opakovani], potvrzeno, odeslano: false,
       };
       r.preskocene = r.preskocene.filter(x => x !== id);
       delete koncept[id];
@@ -263,7 +317,9 @@
       hlava.append(prvek('strong', null, c.nazev));
       hlava.append(prvek('span', 'muted', `${polozka.pocet_serii} × ${c.rozsah_min}–${c.rozsah_max}`));
       karta.append(hlava);
+      if (c.nazev_en) karta.append(anglickyNazev(c.nazev_en));
       if (c.poznamka) karta.append(prvek('div', 'muted poznamka-cviku', c.poznamka));
+      if (c.popis) karta.append(jakNaTo(c.popis));
 
       const minule = hist[0];
       const info = prvek('div', 'minule');

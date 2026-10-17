@@ -193,6 +193,61 @@
       });
     }
 
+    /* ---------- čas: délka tréninků a čas na cvik ---------- */
+
+    function vykresliCas() {
+      const podleTreninku = new Map();
+      for (const z of stav.zaznamy) {
+        if (!podleTreninku.has(z.trenink_id)) podleTreninku.set(z.trenink_id, []);
+        podleTreninku.get(z.trenink_id).push(z);
+      }
+      const treninky = [...stav.treninky.values()].sort((a, b) => a.datum < b.datum ? -1 : a.datum > b.datum ? 1 : a.id - b.id);
+      const delky = [], naCvik = new Map();
+      for (const t of treninky) {
+        const zz = podleTreninku.get(t.id) || [];
+        const d = S.delkaTreninku(t.zacatek, zz.map(z => z.potvrzeno));
+        if (d != null) delky.push({ t, minuty: d });
+        for (const c of S.casyNaCvik(t.zacatek, zz)) {
+          if (!naCvik.has(c.cvik_id)) naCvik.set(c.cvik_id, []);
+          naCvik.get(c.cvik_id).push(c.minuty);
+        }
+      }
+      el('casPrazdny').classList.toggle('hidden', delky.length > 0);
+      el('casObal').classList.toggle('hidden', delky.length === 0);
+      if (!delky.length) return;
+
+      const seznam = el('casCviky');
+      seznam.replaceChildren();
+      [...naCvik.entries()]
+        .map(([id, m]) => ({ id, prumer: m.reduce((a, x) => a + x, 0) / m.length, pocet: m.length }))
+        .sort((a, b) => b.prumer - a.prumer)
+        .forEach(c => {
+          const li = prvek('li');
+          li.append(prvek('span', null, stav.cviky.get(c.id) || 'Cvik ' + c.id),
+            prvek('span', 'muted', `${cislo(c.prumer, 0)} min` + (c.pocet > 1 ? ` (průměr z ${c.pocet})` : '')));
+          seznam.append(li);
+        });
+      if (!root.Chart) return;
+      const akcent = barva('--accent'), muted = barva('--muted'), mrizka = barva('--border');
+      const posledni = delky.slice(-20);
+      nakresli('grafCas', {
+        type: 'bar',
+        data: {
+          labels: posledni.map(d => `${zeDne(naDen(d.t.datum))} ${d.t.varianta}`),
+          datasets: [{ label: 'Délka', data: posledni.map(d => d.minuty), backgroundColor: akcent + '99', borderColor: akcent,
+                       borderWidth: 1, borderRadius: 4, maxBarThickness: 28 }],
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, animation: false,
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: p => `${cislo(p.parsed.y, 0)} min` } } },
+          scales: {
+            x: { ticks: { color: muted, maxRotation: 0, autoSkip: true, maxTicksLimit: 6 }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { color: muted, maxTicksLimit: 5, callback: v => v + ' min' }, grid: { color: mrizka } },
+          },
+        },
+      });
+    }
+
     /* ---------- pocity za 4 týdny ---------- */
 
     function vykresliPocity() {
@@ -217,6 +272,7 @@
       vykresliVahu();
       vykresliSplneni();
       vykresliSilu();
+      vykresliCas();
       vykresliPocity();
     }
 
@@ -225,7 +281,7 @@
 
     // přepnutí světlého a tmavého režimu → překreslit s novými barvami
     root.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      if (!el('panel-progres').classList.contains('hidden')) { vykresliVahu(); vykresliSplneni(); vykresliSilu(); }
+      if (!el('panel-progres').classList.contains('hidden')) { vykresliVahu(); vykresliSplneni(); vykresliSilu(); vykresliCas(); }
     });
 
     return { priZobrazeni };

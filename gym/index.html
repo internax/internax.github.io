@@ -78,9 +78,16 @@
   .stav.ok { color: var(--ok); }
   .stav.warn { color: var(--warn); }
   .cvik { padding: 1rem; }
-  .cvik.hotovy { padding: .75rem 1rem; }
+  .cvik.hotovy { padding: .75rem 1rem; background: color-mix(in srgb, var(--card) 55%, var(--bg)); }
+  .cvik.hotovy strong { color: var(--muted); }
   .cvik-hlava { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
   .poznamka-cviku { margin-top: .2rem; font-size: .8rem; }
+  .nazev-en { display: flex; align-items: center; gap: .3rem; font-size: .78rem; color: var(--muted); font-style: italic; margin-top: .1rem; }
+  button.kopirovat { display: inline-flex; align-items: center; padding: .3rem; border: none; background: none; color: var(--accent); }
+  .zkopirovano { font-style: normal; color: var(--ok); }
+  details.jak-na-to { margin-top: .35rem; font-size: .85rem; }
+  details.jak-na-to summary { color: var(--accent); cursor: pointer; padding: .2rem 0; }
+  details.jak-na-to p { margin: .35rem 0 0; line-height: 1.45; }
   .minule { margin: .6rem 0; font-size: .9rem; }
   .upozorneni { background: color-mix(in srgb, var(--warn) 15%, transparent); color: var(--warn); border-radius: 8px; padding: .5rem .7rem; font-size: .85rem; margin-bottom: .6rem; }
   .stepper { display: flex; align-items: center; gap: .5rem; margin: .5rem 0; }
@@ -268,6 +275,15 @@
           <p class="muted" id="silaVysvetleni"></p>
           <ul class="seznam cviky-progres" id="seznamCviku"></ul>
           <p class="muted" style="margin:.6rem 0 0;">Procenta = změna od prvního záznamu. Barva bodu = pocit z cviku.</p>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Čas</h2>
+        <p class="muted hidden" id="casPrazdny" style="margin:0;">Ukáže se po prvním tréninku s měřením času.</p>
+        <div id="casObal">
+          <div class="graf"><canvas id="grafCas" aria-label="Graf délky tréninků"></canvas></div>
+          <p class="muted" style="margin:.6rem 0 .3rem;">Čas na cvik včetně pauz – od předchozího potvrzeného cviku. Nejdelší nahoře.</p>
+          <ul class="seznam" id="casCviky"></ul>
         </div>
       </div>
       <div class="card">

@@ -69,7 +69,33 @@
     return vysledek;
   }
 
-  const api = { objem, splneniCviku, splneniTreninku, jeRekord, pridanaVaha, tydny };
+  const minuty = (od, do_) => (Date.parse(do_) - Date.parse(od)) / 60000;
+
+  // délka tréninku v minutách: od začátku do posledního potvrzeného cviku; null bez časů
+  function delkaTreninku(zacatek, potvrzeni) {
+    const casy = potvrzeni.filter(Boolean).map(Date.parse).filter(Number.isFinite);
+    if (!zacatek || !Number.isFinite(Date.parse(zacatek)) || !casy.length) return null;
+    const d = (Math.max(...casy) - Date.parse(zacatek)) / 60000;
+    return d >= 0 ? d : null;
+  }
+
+  /*
+   * Čas na cvik včetně pauz: od předchozího potvrzení (u prvního od začátku tréninku) do potvrzení cviku.
+   * Záznamy bez času se přeskočí. → [{ cvik_id, minuty }] v pořadí potvrzení
+   */
+  function casyNaCvik(zacatek, zaznamy) {
+    const s = zaznamy.filter(z => z.potvrzeno && Number.isFinite(Date.parse(z.potvrzeno)))
+      .sort((a, b) => Date.parse(a.potvrzeno) - Date.parse(b.potvrzeno));
+    let pred = zacatek && Number.isFinite(Date.parse(zacatek)) ? zacatek : null;
+    const out = [];
+    for (const z of s) {
+      if (pred) out.push({ cvik_id: z.cvik_id, minuty: Math.max(0, minuty(pred, z.potvrzeno)) });
+      pred = z.potvrzeno;
+    }
+    return out;
+  }
+
+  const api = { objem, splneniCviku, splneniTreninku, jeRekord, pridanaVaha, tydny, delkaTreninku, casyNaCvik };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else (root.GYM = root.GYM || {}).souhrn = api;
 })(this);

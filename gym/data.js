@@ -48,7 +48,7 @@
     // plán obou variant i s cviky, v pořadí
     async function nactiPlan() {
       const radky = zkontroluj(await klient.from('plan')
-        .select('varianta, poradi, pocet_serii, cviky(id, nazev, rozsah_min, rozsah_max, krok_kg, poznamka, doporucena_kg, vaha_popis)')
+        .select('varianta, poradi, pocet_serii, cviky(id, nazev, rozsah_min, rozsah_max, krok_kg, poznamka, doporucena_kg, vaha_popis, nazev_en, popis)')
         .order('poradi', { ascending: true }));
       return radky.filter(r => r.cviky).map(r => ({
         varianta: r.varianta, poradi: r.poradi, pocet_serii: r.pocet_serii,
@@ -63,14 +63,14 @@
     // poslední záznamy od nejnovějšího (id roste s časem)
     async function nactiZaznamy(limit = 500) {
       const radky = zkontroluj(await klient.from('zaznamy')
-        .select('id, trenink_id, cvik_id, vaha_kg, opakovani, pocit, rameno, cil_vaha_kg, cil_opakovani')
+        .select('id, trenink_id, cvik_id, vaha_kg, opakovani, pocit, rameno, cil_vaha_kg, cil_opakovani, potvrzeno')
         .order('id', { ascending: false }).limit(limit));
       const cislo = x => x == null ? null : Number(x);
       return radky.map(r => ({ ...r, vaha_kg: cislo(r.vaha_kg), cil_vaha_kg: cislo(r.cil_vaha_kg) }));
     }
-    async function zalozTrenink(datum, varianta) {
+    async function zalozTrenink(datum, varianta, zacatek) {
       const user_id = await uzivatelId();
-      return zkontroluj(await klient.from('treninky').insert({ user_id, datum, varianta }).select('id').single()).id;
+      return zkontroluj(await klient.from('treninky').insert({ user_id, datum, varianta, zacatek: zacatek || null }).select('id').single()).id;
     }
     // 1 záznam = 1 cvik v tréninku; opakované uložení ho přepíše
     async function ulozZaznam(trenink_id, cvik_id, z) {
@@ -78,13 +78,13 @@
       zkontroluj(await klient.from('zaznamy').upsert({
         user_id, trenink_id, cvik_id: Number(cvik_id), vaha_kg: z.vaha_kg, opakovani: z.opakovani,
         pocit: z.pocit, rameno: Boolean(z.rameno), poznamka: z.poznamka || null,
-        cil_vaha_kg: z.cil_vaha_kg ?? null, cil_opakovani: z.cil_opakovani ?? null,
+        cil_vaha_kg: z.cil_vaha_kg ?? null, cil_opakovani: z.cil_opakovani ?? null, potvrzeno: z.potvrzeno ?? null,
       }, { onConflict: 'trenink_id,cvik_id' }));
     }
 
     // všechny tréninky od nejstaršího
     async function nactiTreninky() {
-      return zkontroluj(await klient.from('treninky').select('id, datum, varianta').order('datum', { ascending: true }));
+      return zkontroluj(await klient.from('treninky').select('id, datum, varianta, zacatek').order('datum', { ascending: true }));
     }
     // všechny cviky včetně vyřazených (kvůli historii)
     async function nactiCviky() {

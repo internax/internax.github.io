@@ -23,7 +23,7 @@
 
     /*
      * Rozpracovaný trénink:
-     * { datum, varianta, trenink_id|null,
+     * { datum, varianta, trenink_id|null, zacatek (ISO čas startu),
      *   zaznamy: { [cvik_id]: { vaha_kg, opakovani: [..], pocit, rameno, poznamka, odeslano } },
      *   preskocene: [cvik_id, ..] }
      */
@@ -38,7 +38,8 @@
         if (jeObjekt(z) && Array.isArray(z.opakovani)) zaznamy[id] = { ...z, odeslano: z.odeslano === true };
       }
       const preskocene = Array.isArray(r.preskocene) ? r.preskocene.map(String).filter(id => !(id in zaznamy)) : [];
-      return { datum: r.datum, varianta: r.varianta, trenink_id: r.trenink_id ?? null, zaznamy, preskocene };
+      const zacatek = typeof r.zacatek === 'string' ? r.zacatek : null;
+      return { datum: r.datum, varianta: r.varianta, trenink_id: r.trenink_id ?? null, zacatek, zaznamy, preskocene };
     }
     function ulozRozpracovany(r) { pis(KLIC_ROZPRACOVANY, JSON.stringify(r)); }
     function smazRozpracovany() { smaz(KLIC_ROZPRACOVANY); }
