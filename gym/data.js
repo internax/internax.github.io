@@ -105,7 +105,55 @@
       zkontroluj(await klient.from('obvody').delete().eq('datum', datum));
     }
 
+    /* ---------- jídlo ---------- */
+
+    async function nactiPotraviny() {
+      const radky = zkontroluj(await klient.from('potraviny')
+        .select('id, klic, nazev, skupina, porce_popis, kcal, bilkoviny, sacharidy, tuky, poradi, aktivni')
+        .order('poradi', { ascending: true }));
+      const c = x => Number(x);
+      return radky.map(p => ({ ...p, kcal: c(p.kcal), bilkoviny: c(p.bilkoviny), sacharidy: c(p.sacharidy), tuky: c(p.tuky) }));
+    }
+    // záznamy jídla v rozmezí dat (včetně)
+    async function nactiJidlo(od, do_) {
+      return zkontroluj(await klient.from('jidlo')
+        .select('id, datum, potravina_id, porce, nazev, kcal, bilkoviny, sacharidy, tuky')
+        .gte('datum', od).lte('datum', do_).order('id', { ascending: true }));
+    }
+    // počet porcí potraviny za den; 0 = smazat
+    async function ulozPorce(datum, potravina_id, porce) {
+      if (!(porce > 0)) {
+        zkontroluj(await klient.from('jidlo').delete().eq('datum', datum).eq('potravina_id', potravina_id));
+        return;
+      }
+      const user_id = await uzivatelId();
+      zkontroluj(await klient.from('jidlo').upsert({ user_id, datum, potravina_id, porce }, { onConflict: 'user_id,datum,potravina_id' }));
+    }
+    async function pridejVlastni(datum, p) {
+      const user_id = await uzivatelId();
+      return zkontroluj(await klient.from('jidlo').insert({ user_id, datum, porce: 1, nazev: p.nazev, kcal: p.kcal,
+        bilkoviny: p.bilkoviny ?? null, sacharidy: p.sacharidy ?? null, tuky: p.tuky ?? null }).select('id').single()).id;
+    }
+    async function smazJidlo(id) {
+      zkontroluj(await klient.from('jidlo').delete().eq('id', id));
+    }
+
+    async function nactiPoznamkuJidla(datum) {
+      const r = zkontroluj(await klient.from('jidlo_poznamky').select('text').eq('datum', datum).limit(1));
+      return r[0] ? r[0].text : '';
+    }
+    // prázdný text = smazat
+    async function ulozPoznamkuJidla(datum, text) {
+      if (!text.trim()) {
+        zkontroluj(await klient.from('jidlo_poznamky').delete().eq('datum', datum));
+        return;
+      }
+      const user_id = await uzivatelId();
+      zkontroluj(await klient.from('jidlo_poznamky').upsert({ user_id, datum, text }, { onConflict: 'user_id,datum' }));
+    }
+
     return {
+      nactiPotraviny, nactiJidlo, ulozPorce, pridejVlastni, smazJidlo, nactiPoznamkuJidla, ulozPoznamkuJidla,
       nactiTreninky, nactiCviky, nactiObvody, ulozObvody, smazObvody,
       relace, prihlasit, odhlasit, priZmenePrihlaseni, nactiVazeni, ulozVahu, smazVahu,
       nactiPlan, nactiPosledniTrenink, nactiZaznamy, zalozTrenink, ulozZaznam,

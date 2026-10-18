@@ -3,7 +3,7 @@
 (function (root) {
   'use strict';
 
-  const ZALOZKY = Object.freeze(['dnes', 'trenink', 'progres', 'obvody']);
+  const ZALOZKY = Object.freeze(['dnes', 'trenink', 'jidlo', 'progres']);   // obvody jsou od 2026-10-18 v Progresu
   const KLIC_ZALOZKA = 'gym_zalozka';
   const KLIC_ROZPRACOVANY = 'gym_rozpracovany';
 

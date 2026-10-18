@@ -146,6 +146,35 @@
   .tyden.tento .popis { color: var(--accent); font-weight: 600; }
   .souhrn-treninku { display: grid; gap: .2rem; margin-bottom: 1rem; padding: .75rem .9rem; border-radius: 10px; background: color-mix(in srgb, var(--ok) 10%, var(--card)); border: 1px solid color-mix(in srgb, var(--ok) 35%, transparent); font-size: .9rem; }
   .souhrn-treninku strong { color: var(--ok); }
+  /* jídlo */
+  .den-prepinac { display: flex; align-items: center; justify-content: space-between; margin-bottom: .8rem; }
+  .den-prepinac button { width: 2.6rem; height: 2.4rem; padding: 0; font-size: 1.3rem; }
+  .makro { margin-bottom: .5rem; }
+  .makro-hlava { display: flex; justify-content: space-between; align-items: baseline; font-size: .8rem; color: var(--muted); }
+  .makro-hlava strong { color: var(--text); font-size: .9rem; }
+  .makro.hlavni .makro-hlava strong { font-size: 1.25rem; }
+  .makro.hlavni .makro-hlava span { font-size: .9rem; }
+  .makra-mrizka { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; }
+  .pruh { height: 8px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border); overflow: hidden; margin-top: .25rem; }
+  .pruh > div { height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+  .pruh > div.splneno { background: var(--ok); }
+  .jidlo-skupina { padding: .9rem 1rem; }
+  .jidlo-skupina h2 { margin-bottom: .4rem; }
+  ul.potraviny { list-style: none; margin: 0; padding: 0; }
+  ul.potraviny li { display: flex; justify-content: space-between; align-items: center; gap: .5rem; padding: .45rem 0; border-bottom: 1px solid var(--border); }
+  ul.potraviny li:last-child { border-bottom: none; }
+  ul.potraviny li.snedeno .potravina-nazev { color: var(--accent); font-weight: 600; }
+  .potravina-popis { display: flex; flex-direction: column; min-width: 0; }
+  .potravina-popis .muted { font-size: .75rem; }
+  .porce-ovladani { display: flex; align-items: center; gap: .35rem; flex: none; }
+  .porce-ovladani button.krok { width: 2.5rem; height: 2.5rem; font-size: 1.2rem; }
+  .porce-ovladani .porce { min-width: 2.4rem; text-align: center; }
+  .odkaz-summary { color: var(--accent); cursor: pointer; padding: .2rem 0; }
+  .vlastni-form { display: grid; gap: .5rem; margin-top: .6rem; }
+  .vlastni-cisla { display: grid; grid-template-columns: repeat(4, 1fr); gap: .4rem; }
+  .vlastni-cisla input { min-width: 0; padding: .5rem .4rem; }
+  textarea { width: 100%; padding: .6rem .65rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font: inherit; font-size: 1rem; resize: vertical; }
+  .nadpis-sekce { margin: 1.6rem 0 .8rem; font-size: 1.1rem; }
   /* obvody */
   .obvody-mrizka { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
   .tabulka-obal { overflow-x: auto; }
@@ -191,8 +220,8 @@
     <div class="tabs" role="tablist">
       <button type="button" role="tab" id="tab-dnes" aria-controls="panel-dnes">Dnes</button>
       <button type="button" role="tab" id="tab-trenink" aria-controls="panel-trenink">Trénink</button>
+      <button type="button" role="tab" id="tab-jidlo" aria-controls="panel-jidlo">Jídlo</button>
       <button type="button" role="tab" id="tab-progres" aria-controls="panel-progres">Progres</button>
-      <button type="button" role="tab" id="tab-obvody" aria-controls="panel-obvody">Obvody</button>
     </div>
 
     <section id="panel-dnes" role="tabpanel" aria-labelledby="tab-dnes">
@@ -250,6 +279,54 @@
       <div id="treninkChyba" class="err-box hidden" style="margin:0 0 1rem;"></div>
       <div id="treninkObsah"></div>
     </section>
+    <section id="panel-jidlo" role="tabpanel" aria-labelledby="tab-jidlo" class="hidden">
+      <div class="card jidlo-prehled">
+        <div class="den-prepinac">
+          <button type="button" id="jidloPred" aria-label="Předchozí den">‹</button>
+          <strong id="jidloDatum">Dnes</strong>
+          <button type="button" id="jidloDalsi" aria-label="Další den">›</button>
+        </div>
+        <div class="makro hlavni"><div class="makro-hlava"><span>Kalorie</span><strong id="jidlo-kcal">–</strong></div><div class="pruh"><div id="pruh-kcal"></div></div></div>
+        <div class="makra-mrizka">
+          <div class="makro"><div class="makro-hlava"><span>Bílkoviny</span><strong id="jidlo-bilkoviny">–</strong></div><div class="pruh"><div id="pruh-bilkoviny"></div></div></div>
+          <div class="makro"><div class="makro-hlava"><span>Sacharidy</span><strong id="jidlo-sacharidy">–</strong></div><div class="pruh"><div id="pruh-sacharidy"></div></div></div>
+          <div class="makro"><div class="makro-hlava"><span>Tuky</span><strong id="jidlo-tuky">–</strong></div><div class="pruh"><div id="pruh-tuky"></div></div></div>
+        </div>
+        <p class="muted" id="jidloZbyva" style="margin:.6rem 0 0;"></p>
+      </div>
+      <div id="jidloChyba" class="err-box hidden" style="margin:0 0 1rem;"></div>
+      <div id="jidloSeznam"></div>
+      <div class="card">
+        <h2>Vlastní položky</h2>
+        <ul class="seznam" id="vlastniSeznam"></ul>
+        <p class="muted" id="vlastniPrazdne" style="margin:0 0 .6rem;">Cokoli, co není v seznamu.</p>
+        <details id="vlastniDetail">
+          <summary class="odkaz-summary">+ Přidat vlastní položku</summary>
+          <form id="vlastniForm" class="vlastni-form">
+            <input type="text" id="vlastniNazev" placeholder="Název, např. Pizza" autocomplete="off">
+            <div class="vlastni-cisla">
+              <input type="text" id="vlastniKcal" inputmode="decimal" placeholder="kcal *">
+              <input type="text" id="vlastniB" inputmode="decimal" placeholder="B g">
+              <input type="text" id="vlastniS" inputmode="decimal" placeholder="S g">
+              <input type="text" id="vlastniT" inputmode="decimal" placeholder="T g">
+            </div>
+            <button type="submit" class="primary">Přidat</button>
+          </form>
+        </details>
+      </div>
+      <div class="card">
+        <h2>Poznámka ke dni</h2>
+        <textarea id="jidloPoznamka" rows="3" placeholder="Co chybělo v seznamu, co bylo jinak… Claude podle toho seznam doplní."></textarea>
+        <div class="muted" id="poznamkaStav" style="min-height:1.2em; margin-top:.3rem;"></div>
+      </div>
+      <div class="card">
+        <h2>Posledních 28 dní</h2>
+        <p class="muted" id="jidloPrumery" style="margin:-.3rem 0 .6rem;"></p>
+        <div class="graf" id="jidloGrafObal"><canvas id="jidloGraf" aria-label="Graf kalorií po dnech"></canvas></div>
+        <p class="muted" style="margin-bottom:0;">Zelená = aspoň 90 % cíle 3 200 kcal. Průměry jen ze dnů, kdy jsi něco zapsal. Jestli jíš dost, rozhodne trend váhy.</p>
+      </div>
+    </section>
+
     <section id="panel-progres" role="tabpanel" aria-labelledby="tab-progres" class="hidden">
       <div id="progresChyba" class="err-box hidden" style="margin:0 0 1rem;"></div>
       <div class="card">
@@ -295,9 +372,7 @@
         </div>
         <p class="muted" style="margin-bottom:0;">Většina by měla být „Cítil jsem to“. Samé pohoda = přitlačit, hodně na hraně = probrat spánek a jídlo.</p>
       </div>
-    </section>
-
-    <section id="panel-obvody" role="tabpanel" aria-labelledby="tab-obvody" class="hidden">
+      <h2 class="nadpis-sekce">Obvody</h2>
       <div class="card">
         <h2>Nové měření</h2>
         <form id="obvodyForm">
@@ -328,6 +403,8 @@
         <p class="muted" style="margin-bottom:0;">Malé číslo = změna od prvního měření v cm.</p>
       </div>
     </section>
+
+
   </div>
 </div>
 
@@ -339,12 +416,14 @@
 <script src="prumery.js"></script>
 <script src="progrese.js"></script>
 <script src="souhrn.js"></script>
+<script src="vyziva.js"></script>
 <script src="ulozeni.js"></script>
 <script src="data.js"></script>
 <script src="dnes.js"></script>
 <script src="trenink.js"></script>
 <script src="progres.js"></script>
 <script src="obvody.js"></script>
+<script src="jidlo.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

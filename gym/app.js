@@ -12,7 +12,7 @@
     chybaStranky('Nepodařilo se načíst aplikaci. Zkontroluj připojení k internetu a obnov stránku.');
     return;
   }
-  const { konfigurace: KONF, ulozeni: U, data: D, dnes: DNES, trenink: TR, progres: PR, obvody: OB } = root.GYM;
+  const { konfigurace: KONF, ulozeni: U, data: D, dnes: DNES, trenink: TR, progres: PR, obvody: OB, jidlo: JI } = root.GYM;
 
   let storage = null;
   try { storage = root.localStorage; } catch (e) { storage = null; }
@@ -29,6 +29,8 @@
   const progres = PR.vytvorProgres(data);
   const obvody = OB.vytvorObvody(data);
   obvody.spust();
+  const jidlo = JI.vytvorJidlo(data);
+  jidlo.spust();
 
   /* ---------- záložky ---------- */
 
@@ -38,7 +40,8 @@
       el('panel-' + nazev).classList.toggle('hidden', nazev !== z);
     }
     ul.ulozZalozku(z);
-    if (z === 'progres' && prihlasen) progres.priZobrazeni();     // grafy jen do viditelného panelu, vždy s čerstvými daty
+    if (z === 'progres' && prihlasen) progres.priZobrazeni();
+    if (z === 'jidlo' && prihlasen) jidlo.priZobrazeni();     // grafy jen do viditelného panelu, vždy s čerstvými daty
   }
   for (const nazev of U.ZALOZKY) el('tab-' + nazev).addEventListener('click', () => prepniZalozku(nazev));
 
@@ -55,7 +58,7 @@
     if (je) {
       setTimeout(() => {
         prepniZalozku(ul.nactiZalozku());
-        dnes.nacti(); trenink.nacti(); obvody.nacti();
+        dnes.nacti(); trenink.nacti(); obvody.nacti(); jidlo.nacti();
       }, 0);    // ne přímo v onAuthStateChange – Supabase by se mohl zaseknout na zámku relace
     }
   }
