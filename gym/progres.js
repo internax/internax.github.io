@@ -126,22 +126,33 @@
       const jednotka = body[body.length - 1].vykon.jednotka === 'kg' ? 'kg' : 'opak.';
       el('silaNadpis').textContent = stav.cviky.get(vybrany) || '';
       el('silaVysvetleni').textContent = jednotka === 'kg'
-        ? 'Odhad maxima na 1 opakování z nejlepší série – roste, když přidáš váhu i opakování.'
+        ? 'Plná čára: odhad maxima na 1 opakování z nejlepší série – roste, když přidáš váhu i opakování. Čárkovaná: váha, kterou jsi skutečně zvedl.'
         : 'Součet opakování ve všech sériích.';
       if (!root.Chart) return;
       const ok = barva('--ok');
       const barvyPocitu = { zelena: barva('--ok'), zluta: barva('--stred'), cervena: barva('--bad') };
-      nakresli('grafSila', {
-        type: 'line',
-        data: { datasets: [{
-          label: jednotka === 'kg' ? 'Odhad síly' : 'Opakování',
-          data: body.map(b => ({ x: b.den, y: b.vykon.hodnota })),
-          borderColor: ok, borderWidth: 2.5, tension: 0.2, pointRadius: 4,
-          pointBackgroundColor: body.map(b => barvyPocitu[b.zaznam.pocit] || ok),
-          pointBorderColor: body.map(b => barvyPocitu[b.zaznam.pocit] || ok),
-        }] },
-        options: nastaveniGrafu(jednotka),
-      });
+      const datasets = [{
+        label: jednotka === 'kg' ? 'Odhad maxima' : 'Opakování',
+        data: body.map(b => ({ x: b.den, y: b.vykon.hodnota })),
+        borderColor: ok, backgroundColor: ok, borderWidth: 2.5, tension: 0.2, pointRadius: 4,
+        pointBackgroundColor: body.map(b => barvyPocitu[b.zaznam.pocit] || ok),
+        pointBorderColor: body.map(b => barvyPocitu[b.zaznam.pocit] || ok),
+      }];
+      // skutečně zvednutá váha (jen u cviků s váhou); v popisku i opakování
+      if (jednotka === 'kg') {
+        const akcent = barva('--accent');
+        datasets.push({
+          label: 'Zvednutá váha',
+          data: body.map(b => ({ x: b.den, y: Number(b.zaznam.vaha_kg), opakovani: b.zaznam.opakovani })),
+          borderColor: akcent, backgroundColor: akcent, borderWidth: 2, borderDash: [5, 4], tension: 0.2, pointRadius: 3,
+        });
+      }
+      const nastaveni = nastaveniGrafu(jednotka);
+      nastaveni.plugins.legend = { display: datasets.length > 1, labels: { color: barva('--muted'), boxWidth: 12, boxHeight: 2 } };
+      nastaveni.plugins.tooltip.callbacks.label = p => p.raw.opakovani
+        ? `${p.dataset.label}: ${cislo(p.parsed.y)} kg × ${p.raw.opakovani.join(', ')}`
+        : `${p.dataset.label}: ${cislo(p.parsed.y)} ${jednotka}`;
+      nakresli('grafSila', { type: 'line', data: { datasets }, options: nastaveni });
     }
 
     /* ---------- splnění plánu po trénincích ---------- */
